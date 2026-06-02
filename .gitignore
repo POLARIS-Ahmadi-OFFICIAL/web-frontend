@@ -1,0 +1,94 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Next.js
+.next/
+out/
+build/
+
+# Production
+dist/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vercel
+.vercel/
+
+# Turbopack / Turborepo
+.turbo/
+
+# Coverage
+coverage/
+.nyc_output/
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Cache directories
+.cache/
+.parcel-cache/
+.eslintcache
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Yarn
+.yarn/*
+!.yarn/cache
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+
+# npm package lockfiles (optional - keep if collaborating)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Storybook
+storybook-static/
+
+# Testing
+playwright-report/
+test-results/
+
+# Local database files
+*.sqlite
+*.sqlite3
+
+# Miscellaneous
+*.tgz
+.vercel
