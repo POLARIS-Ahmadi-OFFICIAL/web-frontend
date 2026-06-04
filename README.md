@@ -21,6 +21,18 @@ From this repo (starts backend on :8080, Next on :3000, Expo):
 npm run dev:stack
 ```
 
+## Production (Vercel + Railway)
+
+Vercel hosts this app only. Deploy the API separately — see [backend-api/docs/DEPLOY-RAILWAY.md](../backend-api/docs/DEPLOY-RAILWAY.md).
+
+In Vercel → **Environment Variables**:
+
+```bash
+NEXT_PUBLIC_API_URL=https://<your-railway-domain>
+```
+
+Add the same Vercel URL to the backend `CORS_ORIGINS` on Railway.
+
 ### Auth
 
 - App opens at **`/login`** first (GitHub via Supabase, or **Skip (dev)** with a bypass cookie).
