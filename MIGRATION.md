@@ -2,4 +2,4 @@
 
 Streamlit pages map to App Router routes under `app/(app)/`. See [RESTRUCTURE-DOCUMENTATION.md](./RESTRUCTURE-DOCUMENTATION.md).
 
-API types: `@polaris/shared-types` (local: `file:../shared-types`).
+API paths: `lib/api-path.ts` (aligned with `@polaris/shared-types` contract repo). For local monorepo dev you may still link shared-types separately.

@@ -2,6 +2,7 @@ export function Button({
   children,
   variant = "primary",
   fullWidth,
+  className = "",
   onClick,
   disabled,
   type = "button",
@@ -9,6 +10,7 @@ export function Button({
   children: React.ReactNode;
   variant?: "primary" | "secondary";
   fullWidth?: boolean;
+  className?: string;
   onClick?: () => void;
   disabled?: boolean;
   type?: "button" | "submit";
@@ -26,7 +28,7 @@ export function Button({
       type={type}
       disabled={disabled}
       onClick={onClick}
-      className={`${base} ${variants[variant]} ${fullWidth ? "w-full" : ""}`}
+      className={`${base} ${variants[variant]} ${fullWidth ? "w-full" : ""} ${className}`.trim()}
     >
       {children}
     </button>

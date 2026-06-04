@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { apiPath } from "@polaris/shared-types";
+import { apiPath } from "@/lib/api-path";
 
 import { Alert, Button, Expander, FormField, Metric, MetricRow, StreamlitPage, TwoCol } from "@/components/ui";
 import { getApiBase } from "@/lib/api-base";

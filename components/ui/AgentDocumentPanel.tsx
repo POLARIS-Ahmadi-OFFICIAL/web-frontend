@@ -1,6 +1,6 @@
 "use client";
 
-import { apiPath } from "@polaris/shared-types";
+import { apiPath } from "@/lib/api-path";
 
 import { Button } from "@/components/ui/Button";
 import { getApiBase } from "@/lib/api-base";

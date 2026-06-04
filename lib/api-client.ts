@@ -1,4 +1,4 @@
-import { apiPath } from "@polaris/shared-types";
+import { apiPath } from "@/lib/api-path";
 
 import { getApiBase } from "@/lib/api-base";
 
@@ -14,7 +14,9 @@ export class ApiError extends Error {
 const DEFAULT_TIMEOUT_MS = 30_000;
 const AGENT_TIMEOUT_MS = 300_000;
 
-function serializeFetchBody(body: RequestInit["body"]): BodyInit | undefined {
+type ApiFetchBody = RequestInit["body"] | Record<string, unknown> | unknown[];
+
+function serializeFetchBody(body: ApiFetchBody | undefined): BodyInit | undefined {
   if (body === undefined || body === null) {
     return undefined;
   }
@@ -33,7 +35,11 @@ function serializeFetchBody(body: RequestInit["body"]): BodyInit | undefined {
 
 export async function apiFetch<T>(
   path: string,
-  options: RequestInit & { token?: string | null; timeoutMs?: number } = {},
+  options: Omit<RequestInit, "body"> & {
+    body?: ApiFetchBody;
+    token?: string | null;
+    timeoutMs?: number;
+  } = {},
 ): Promise<T> {
   const { token, headers, timeoutMs, body, ...rest } = options;
   const url = `${getApiBase()}${apiPath(path)}`;
@@ -150,6 +156,7 @@ export type DashboardSummary = {
   experiment_id?: number | null;
   stage?: string | null;
   active_workflow?: boolean;
+  hypothesis_ready?: boolean;
   last_hypothesis_preview?: string | null;
   agent_counts?: Record<string, number>;
 };
@@ -704,7 +711,6 @@ export type MlSession = {
   json_file?: string | null;
   csv_file?: string | null;
   composition_file?: string | null;
-  composition_path?: string | null;
   models_requiring_composition?: string[];
   has_composition_file?: boolean;
   has_curve_fitting_exports?: boolean;

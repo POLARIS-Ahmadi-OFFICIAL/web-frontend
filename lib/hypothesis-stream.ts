@@ -1,8 +1,8 @@
-import { apiPath } from "@polaris/shared-types";
+import { apiPath } from "@/lib/api-path";
 
 import { ApiError } from "@/lib/api-client";
 import { getApiBase } from "@/lib/api-base";
-import type { HypothesisBubble, HypothesisChatResponse } from "@/lib/api-client";
+import type { HypothesisChatBubble, HypothesisChatResponse } from "@/lib/api-client";
 
 const AGENT_TIMEOUT_MS = 300_000;
 
@@ -15,7 +15,7 @@ export type HypothesisStreamBody = {
 
 export type HypothesisProgressEvent = {
   step?: string;
-  messages?: HypothesisBubble[];
+  messages?: HypothesisChatBubble[];
   label?: string;
 };
 
@@ -87,14 +87,14 @@ export async function streamHypothesisChat(
         if (event === "progress") {
           handlers.onProgress?.({
             step: payload.step as string | undefined,
-            messages: (payload.messages as HypothesisBubble[]) ?? [],
+            messages: (payload.messages as HypothesisChatBubble[]) ?? [],
             label: payload.label as string | undefined,
           });
         }
         if (event === "complete") {
           handlers.onComplete?.({
             stage: String(payload.stage ?? "initial"),
-            messages: (payload.messages as HypothesisBubble[]) ?? [],
+            messages: (payload.messages as HypothesisChatBubble[]) ?? [],
             assistant_message: String(payload.assistant_message ?? ""),
             options: (payload.options as string[]) ?? [],
             error: (payload.error as string | null) ?? null,
