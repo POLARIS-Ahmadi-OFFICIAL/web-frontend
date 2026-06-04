@@ -5,11 +5,13 @@ node_modules/
 
 # Next.js
 .next/
+.next/electron-standalone/
 out/
 build/
 
 # Production
 dist/
+dist-electron/
 
 # Logs
 logs/

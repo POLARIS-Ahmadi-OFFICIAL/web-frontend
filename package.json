@@ -10,7 +10,10 @@
     "lint": "eslint",
     "dev:stack": "node scripts/dev-stack.mjs",
     "dev:desktop": "concurrently -k \"npm run dev\" \"wait-on http://127.0.0.1:3000 && electron .\"",
-    "build:desktop": "next build && electron-builder"
+    "build:desktop": "node scripts/build-desktop.mjs",
+    "build:desktop:mac": "node scripts/build-desktop.mjs --mac",
+    "build:desktop:win": "node scripts/build-desktop.mjs --win",
+    "prepare:standalone": "node scripts/prepare-standalone.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.6.1",
@@ -39,12 +42,34 @@
     "appId": "com.polarisahmadi.desktop",
     "productName": "POLARIS",
     "directories": {
-      "output": "dist-electron"
+      "output": "dist-electron",
+      "buildResources": "electron/build"
     },
     "files": [
       "electron/**/*",
       "package.json"
     ],
+    "extraResources": [
+      {
+        "from": ".next/electron-standalone",
+        "to": "standalone",
+        "filter": ["**/*"]
+      }
+    ],
+    "asar": true,
+    "mac": {
+      "category": "public.app-category.education",
+      "target": ["dmg", "zip"],
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false
+    },
+    "win": {
+      "target": ["nsis", "portable"]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
     "publish": {
       "provider": "github",
       "owner": "POLARIS-Ahmadi-OFFICIAL",

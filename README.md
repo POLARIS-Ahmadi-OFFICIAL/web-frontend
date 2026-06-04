@@ -40,12 +40,25 @@ Add the same Vercel URL to the backend `CORS_ORIGINS` on Railway.
 - API calls from the browser use same-origin `/api/v1/*` (proxied to the backend by `next.config.ts`).
 - LLM providers: **Qwen** (Hugging Face) and **Google Gemini** in Settings → General.
 
-## Desktop
+## Desktop (Electron)
+
+**Development** (Next dev server + Electron window):
 
 ```bash
 npm run dev:desktop
 ```
 
+**Production installers** (bundles Next.js; run on each OS):
+
+```bash
+# Set API URL before building (see docs/DESKTOP-BUILD.md)
+export NEXT_PUBLIC_API_URL=https://your-api.up.railway.app
+npm run build:desktop:mac   # macOS — .dmg + .zip in dist-electron/
+npm run build:desktop:win   # Windows — NSIS + portable .exe
+```
+
+Full guide: **[docs/DESKTOP-BUILD.md](./docs/DESKTOP-BUILD.md)**. Tag `v*` pushes build both via GitHub Actions.
+
 ## Deploy
 
-Vercel for web; GitHub Releases + `electron-builder` for desktop (`npm run build:desktop`).
+Vercel for web; Railway (or similar) for API; GitHub Releases for desktop builds.
