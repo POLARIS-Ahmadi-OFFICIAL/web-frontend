@@ -1,15 +1,23 @@
 {
   "name": "web-frontend",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
+  "main": "electron/main.cjs",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "dev:stack": "node scripts/dev-stack.mjs",
+    "dev:desktop": "concurrently -k \"npm run dev\" \"wait-on http://127.0.0.1:3000 && electron .\"",
+    "build:desktop": "next build && electron-builder"
   },
   "dependencies": {
+    "@polaris/shared-types": "file:../shared-types",
+    "@supabase/ssr": "^0.6.1",
+    "@supabase/supabase-js": "^2.49.1",
     "next": "16.2.7",
+    "next-themes": "^0.4.6",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
@@ -18,9 +26,30 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^9.1.2",
+    "electron": "^35.0.0",
+    "electron-builder": "^25.1.8",
+    "electron-updater": "^6.3.9",
     "eslint": "^9",
     "eslint-config-next": "16.2.7",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wait-on": "^8.0.2"
+  },
+  "build": {
+    "appId": "com.polarisahmadi.desktop",
+    "productName": "POLARIS",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "electron/**/*",
+      "package.json"
+    ],
+    "publish": {
+      "provider": "github",
+      "owner": "POLARIS-Ahmadi-OFFICIAL",
+      "repo": "web-frontend"
+    }
   }
 }

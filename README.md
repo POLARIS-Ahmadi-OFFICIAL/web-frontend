@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# web-frontend
 
-## Getting Started
+POLARIS web UI (Next.js) and desktop shell (Electron).
 
-First, run the development server:
+## Development
 
 ```bash
+npm install
+cp .env.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000 — requires [backend-api](../backend-api) on port 8080 for live health check.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Run API + web + mobile together
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+From this repo (starts backend on :8080, Next on :3000, Expo):
 
-## Learn More
+```bash
+# Ensure backend venv exists: cd ../backend-api && python3 -m venv .venv && pip install -e ".[dev]"
+npm run dev:stack
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Auth
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- App opens at **`/login`** first (GitHub via Supabase, or **Skip (dev)** with a bypass cookie).
+- Add redirect URL in Supabase: `http://localhost:3000/auth/callback`.
+- API calls from the browser use same-origin `/api/v1/*` (proxied to the backend by `next.config.ts`).
+- LLM providers: **Qwen** (Hugging Face) and **Google Gemini** in Settings → General.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Desktop
 
-## Deploy on Vercel
+```bash
+npm run dev:desktop
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deploy
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Vercel for web; GitHub Releases + `electron-builder` for desktop (`npm run build:desktop`).
