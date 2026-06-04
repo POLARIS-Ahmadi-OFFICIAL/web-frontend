@@ -1,34 +1,51 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 
 import { AppNav } from "@/components/AppNav";
 
 const NAV_COLLAPSED_KEY = "polaris-nav-collapsed";
+const navListeners = new Set<() => void>();
+
+function readNavCollapsed(): boolean {
+  try {
+    return window.localStorage.getItem(NAV_COLLAPSED_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function subscribeNavCollapsed(onStoreChange: () => void) {
+  navListeners.add(onStoreChange);
+  const onStorage = (e: StorageEvent) => {
+    if (e.key === NAV_COLLAPSED_KEY) onStoreChange();
+  };
+  window.addEventListener("storage", onStorage);
+  return () => {
+    navListeners.delete(onStoreChange);
+    window.removeEventListener("storage", onStorage);
+  };
+}
+
+function setNavCollapsed(next: boolean) {
+  try {
+    window.localStorage.setItem(NAV_COLLAPSED_KEY, next ? "1" : "0");
+  } catch {
+    /* ignore */
+  }
+  navListeners.forEach((listener) => listener());
+}
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const [collapsed, setCollapsed] = useState(false);
-  const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
-    try {
-      setCollapsed(window.localStorage.getItem(NAV_COLLAPSED_KEY) === "1");
-    } catch {
-      /* ignore */
-    }
-    setHydrated(true);
-  }, []);
+  const hydrated = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+  const collapsed = useSyncExternalStore(subscribeNavCollapsed, readNavCollapsed, () => false);
 
   const toggleCollapsed = useCallback(() => {
-    setCollapsed((prev) => {
-      const next = !prev;
-      try {
-        window.localStorage.setItem(NAV_COLLAPSED_KEY, next ? "1" : "0");
-      } catch {
-        /* ignore */
-      }
-      return next;
-    });
+    setNavCollapsed(!readNavCollapsed());
   }, []);
 
   return (

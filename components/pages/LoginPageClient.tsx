@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { Alert, Button, StreamlitPage } from "@/components/ui";
@@ -9,25 +9,22 @@ import { createClient } from "@/lib/supabase/client";
 export function LoginPageClient() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const supabaseConfigured = Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   );
-
-  useEffect(() => {
-    if (searchParams.get("error")) {
-      setError("Sign-in failed. Check Supabase GitHub provider configuration.");
-    }
-  }, [searchParams]);
+  const error = searchParams.get("error")
+    ? "Sign-in failed. Check Supabase GitHub provider configuration."
+    : actionError;
 
   async function signInWithGitHub() {
     const supabase = createClient();
     if (!supabase) {
-      setError("Supabase is not configured. Add NEXT_PUBLIC_SUPABASE_URL and ANON_KEY.");
+      setActionError("Supabase is not configured. Add NEXT_PUBLIC_SUPABASE_URL and ANON_KEY.");
       return;
     }
     setLoading(true);
-    setError(null);
+    setActionError(null);
     const next = searchParams.get("next") || "/home";
     const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
     const { error: authError } = await supabase.auth.signInWithOAuth({
@@ -35,7 +32,7 @@ export function LoginPageClient() {
       options: { redirectTo },
     });
     if (authError) {
-      setError(authError.message);
+      setActionError(authError.message);
       setLoading(false);
     }
   }

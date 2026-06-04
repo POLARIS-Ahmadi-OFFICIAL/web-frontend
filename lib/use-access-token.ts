@@ -9,10 +9,7 @@ export function useAccessToken() {
   const supabase = createClient();
 
   useEffect(() => {
-    if (!supabase) {
-      setToken(null);
-      return;
-    }
+    if (!supabase) return;
     supabase.auth.getSession().then(({ data }) => setToken(data.session?.access_token ?? null));
     const {
       data: { subscription },

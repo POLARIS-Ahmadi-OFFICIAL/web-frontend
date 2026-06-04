@@ -12,7 +12,6 @@ import {
   StreamlitPage,
   Tabs,
   TextInput,
-  TwoCol,
 } from "@/components/ui";
 import { clearSessionCache, getSettings, patchSettings } from "@/lib/api-client";
 import { LLM_PROVIDERS, type LlmProviderId } from "@/lib/polaris-content";
@@ -36,10 +35,7 @@ export function SettingsPageClient() {
   const [cacheClearing, setCacheClearing] = useState(false);
 
   const meta = useMemo(() => LLM_PROVIDERS[provider], [provider]);
-
-  useEffect(() => {
-    setModel(customModel.trim() || meta.defaultModel);
-  }, [provider, meta.defaultModel, customModel]);
+  const selectedModel = customModel.trim() || model;
 
   useEffect(() => {
     getSettings(token)
@@ -66,7 +62,7 @@ export function SettingsPageClient() {
     try {
       await patchSettings(token, {
         llm_provider: provider,
-        llm_model: customModel.trim() || model,
+        llm_model: selectedModel,
         qwen_base_url: provider === "qwen" ? endpoint : undefined,
         api_key: apiKey.trim() || undefined,
       });
@@ -137,14 +133,22 @@ export function SettingsPageClient() {
                         label: p.label,
                       }))}
                       value={provider}
-                      onChange={(e) => setProvider(e.target.value as LlmProviderId)}
+                      onChange={(e) => {
+                        const p = e.target.value as LlmProviderId;
+                        setProvider(p);
+                        setModel(LLM_PROVIDERS[p].defaultModel);
+                        setCustomModel("");
+                      }}
                     />
                   </FormField>
                   <FormField label={`${meta.label} model`}>
                     <Select
                       options={meta.models.map((m) => ({ value: m, label: m }))}
-                      value={model}
-                      onChange={(e) => setModel(e.target.value)}
+                      value={selectedModel}
+                      onChange={(e) => {
+                        setModel(e.target.value);
+                        setCustomModel("");
+                      }}
                     />
                   </FormField>
                   <FormField label="Or custom model ID">

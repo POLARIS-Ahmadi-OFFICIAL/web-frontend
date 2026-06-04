@@ -17,7 +17,6 @@ import {
   TextInput,
 } from "@/components/ui";
 import {
-  applyWorkflow,
   deleteWorkflow,
   exportWorkflowJson,
   getWorkflowSession,
