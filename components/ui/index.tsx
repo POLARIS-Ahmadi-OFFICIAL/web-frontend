@@ -19,3 +19,4 @@ export { StreamlitPage } from "./StreamlitPage";
 export { Tabs } from "./Tabs";
 export { TwoCol, FiveCol } from "./Columns";
 export { MarkdownBlock } from "./MarkdownBlock";
+export { AgentShell } from "./AgentShell";
