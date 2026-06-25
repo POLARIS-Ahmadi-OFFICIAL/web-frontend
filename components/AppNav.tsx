@@ -2,126 +2,88 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 import { AuthNav } from "@/components/AuthNav";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
-const SECTIONS = [
-  {
-    title: "Overview",
-    items: [
-      { href: "/home", label: "Home", icon: "⌂" },
-      { href: "/dashboard", label: "Analytics", icon: "◫" },
-      { href: "/workflow", label: "Workflow", icon: "◎" },
-    ],
-  },
-  {
-    title: "Research agents",
-    items: [
-      { href: "/agents/hypothesis", label: "Hypothesis", icon: "◇" },
-      { href: "/agents/experiment", label: "Experiment", icon: "⬡" },
-      { href: "/agents/curve-fitting", label: "Curve Fitting", icon: "⌁" },
-      { href: "/agents/ml-models", label: "ML Models", icon: "◈" },
-      { href: "/agents/analysis", label: "Analysis", icon: "◉" },
-    ],
-  },
-  {
-    title: "Lab tools",
-    items: [
-      { href: "/tools/watcher", label: "Watcher", icon: "👁" },
-      { href: "/tools/mcp", label: "MCP", icon: "⛓" },
-      { href: "/settings", label: "Settings", icon: "⚙" },
-      { href: "/history", label: "History", icon: "☰" },
-    ],
-  },
-];
+const ITEMS = [
+  { href: "/home",                  label: "Home",         icon: "bi-house-fill" },
+  { href: "/dashboard",             label: "Analytics",    icon: "bi-bar-chart-fill" },
+  { href: "/workflow",              label: "Workflow",     icon: "bi-diagram-3-fill" },
+  { href: "/agents/hypothesis",     label: "Hypothesis",   icon: "bi-lightbulb-fill" },
+  { href: "/agents/experiment",     label: "Experiment",   icon: "bi-flask-fill" },
+  { href: "/agents/curve-fitting",  label: "Curve Fitting", icon: "bi-graph-up-arrow" },
+  { href: "/agents/ml-models",      label: "ML Models",    icon: "bi-cpu-fill" },
+  { href: "/agents/analysis",       label: "Analysis",     icon: "bi-clipboard-data-fill" },
+  { href: "/tools/watcher",         label: "Watcher",      icon: "bi-eye-fill" },
+  { href: "/tools/mcp",             label: "MCP",          icon: "bi-link-45deg" },
+  { href: "/settings",              label: "Settings",     icon: "bi-gear-fill" },
+  { href: "/history",               label: "History",      icon: "bi-clock-history" },
+] as const;
 
-export function AppNav({
-  collapsed = false,
-  onToggleCollapsed,
-  showCollapseControl = true,
-}: {
-  collapsed?: boolean;
-  onToggleCollapsed?: () => void;
-  showCollapseControl?: boolean;
-}) {
+export function AppNav() {
   const pathname = usePathname();
+  const [showAccount, setShowAccount] = useState(false);
 
   return (
     <nav
       aria-label="Main navigation"
-      aria-hidden={collapsed ? true : undefined}
-      inert={collapsed ? true : undefined}
-      className={`st-app-nav flex min-h-screen shrink-0 flex-col border-r border-[var(--st-border)] bg-[var(--st-sidebar)] ${
-        collapsed ? "st-app-nav--collapsed" : ""
-      }`}
+      className="st-app-nav flex flex-col items-center border-r border-[var(--st-border)] bg-[var(--st-sidebar)] py-3 gap-1"
     >
-      <div className="flex flex-1 flex-col overflow-y-auto px-3 py-5">
-        <div className="mb-6 flex items-start justify-between gap-2 px-2">
-          <Link href="/home" className="min-w-0 flex-1 rounded-[var(--st-radius-sm)] focus-visible:outline-none">
-            <p className="truncate text-lg font-semibold tracking-tight text-[var(--st-text)]">POLARIS</p>
-            <p className="truncate text-xs text-[var(--st-muted)]">Materials research AI</p>
-          </Link>
-          {showCollapseControl && onToggleCollapsed ? (
-            <button
-              type="button"
-              onClick={onToggleCollapsed}
-              className="st-nav-collapse-btn shrink-0"
-              aria-label="Hide sidebar for full-width content"
-              title="Hide sidebar"
-            >
-              <span aria-hidden className="text-sm leading-none">
-                ‹
-              </span>
-            </button>
-          ) : null}
-        </div>
+      {/* Logo */}
+      <Link
+        href="/home"
+        aria-label="POLARIS home"
+        title="POLARIS"
+        className="mb-3 flex h-7 w-7 items-center justify-center rounded-[var(--st-radius-sm)] bg-[var(--st-primary)] text-xs font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--st-primary)]/50"
+      >
+        P
+      </Link>
 
-        <div className="mb-6 px-2">
-          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--st-muted)]">
-            Appearance
-          </p>
-          <ThemeToggle compact />
-        </div>
+      {/* Nav items */}
+      <ul className="flex flex-col items-center gap-1 flex-1">
+        {ITEMS.map((item) => {
+          const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+          return (
+            <li key={item.href}>
+              <Link
+                href={item.href}
+                aria-label={item.label}
+                aria-current={active ? "page" : undefined}
+                title={item.label}
+                className={`st-nav-item flex h-9 w-9 items-center justify-center rounded-[var(--st-radius-sm)] transition-colors ${
+                  active
+                    ? "bg-[var(--st-nav-active-bg)] text-[var(--st-nav-active-text)]"
+                    : "text-[var(--st-muted)] hover:bg-[var(--st-hover)] hover:text-[var(--st-text)]"
+                }`}
+              >
+                <i className={`bi ${item.icon} text-base`} aria-hidden="true" />
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
 
-        {SECTIONS.map((section) => (
-          <div key={section.title} className="mb-5">
-            <p className="mb-1 px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-[var(--st-muted)]">
-              {section.title}
-            </p>
-            <ul className="space-y-0.5">
-              {section.items.map((item) => {
-                const active =
-                  pathname === item.href || pathname.startsWith(`${item.href}/`);
-                return (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      aria-current={active ? "page" : undefined}
-                      tabIndex={collapsed ? -1 : undefined}
-                      className={`flex min-h-[40px] items-center gap-3 rounded-[var(--st-radius-sm)] px-3 py-2 text-sm transition ${
-                        active
-                          ? "bg-[var(--st-nav-active-bg)] font-medium text-[var(--st-nav-active-text)] shadow-[var(--st-shadow-sm)]"
-                          : "text-[var(--st-text)] hover:bg-[var(--st-hover)]"
-                      }`}
-                    >
-                      <span
-                        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[var(--st-hover)] text-xs opacity-80"
-                        aria-hidden
-                      >
-                        {item.icon}
-                      </span>
-                      {item.label}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
+      {/* Account button at bottom */}
+      <div className="relative mt-auto">
+        <button
+          type="button"
+          aria-label="Account"
+          title="Account"
+          onClick={() => setShowAccount((v) => !v)}
+          className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--st-surface-raised)] text-[var(--st-muted)] hover:text-[var(--st-text)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--st-primary)]/50"
+        >
+          <i className="bi bi-person-fill text-sm" aria-hidden="true" />
+        </button>
+        {showAccount && (
+          <div className="absolute bottom-10 left-10 z-50 w-56 rounded-[var(--st-radius)] border border-[var(--st-border)] bg-[var(--st-surface)] p-2 shadow-[var(--st-shadow-lg)]">
+            <div className="mb-2 px-2">
+              <ThemeToggle compact />
+            </div>
+            <AuthNav />
           </div>
-        ))}
-      </div>
-      <div className="border-t border-[var(--st-border)] px-2 py-3">
-        <AuthNav />
+        )}
       </div>
     </nav>
   );
