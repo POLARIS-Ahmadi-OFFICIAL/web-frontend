@@ -1,19 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 
-import {
-  Alert,
-  Button,
-  Expander,
-  FormField,
-  MultiSelect,
-  Select,
-  StreamlitPage,
-  TextArea,
-  TextInput,
-  TwoCol,
-} from "@/components/ui";
+import { AgentShell, Alert, Button, Expander, FormField, MultiSelect, Select, TextArea, TextInput, TwoCol } from "@/components/ui";
 import { AgentDocumentPanel } from "@/components/ui/AgentDocumentPanel";
 import { MarkdownBlock } from "@/components/ui/MarkdownBlock";
 import {
@@ -61,6 +51,7 @@ function downloadText(filename: string, content: string, mime = "text/plain") {
 
 export function ExperimentPageClient() {
   const token = useAccessToken();
+  const router = useRouter();
   const [session, setSession] = useState<ExperimentSession | null>(null);
   const [constraints, setConstraints] = useState<ExperimentalConstraints>(DEFAULT_CONSTRAINTS);
   const [manual, setManual] = useState<ExperimentManualInputs>(DEFAULT_MANUAL);
@@ -277,18 +268,14 @@ export function ExperimentPageClient() {
 
   const readiness = session?.readiness;
 
-  return (
-    <StreamlitPage
-      title="Experiment Agent"
-      icon="🧪"
-      description="Experimental planning and protocol generation (Streamlit parity)."
-      layout="centered"
-    >
+  // ── Slot definitions ──────────────────────────────────────────────────────
+
+  const chatContentSlot = (
+    <div className="flex flex-col gap-3">
       {error ? <Alert variant="error">{error}</Alert> : null}
       {success ? <Alert variant="success">{success}</Alert> : null}
 
       {readiness ? (
-        <div className="mb-4">
         <Alert variant={readiness.ready_to_run ? "success" : "info"}>
           {readiness.ready_to_run ? (
             <span>
@@ -302,7 +289,6 @@ export function ExperimentPageClient() {
             </span>
           )}
         </Alert>
-        </div>
       ) : null}
 
       {hasAnalysisContext ? (
@@ -458,7 +444,7 @@ export function ExperimentPageClient() {
         </div>
       </Expander>
 
-      <div className="mt-4">
+      <div className="mt-2">
       <Expander title="⚙️ Experimental parameters and constraints">
         <MultiSelect
           label="Experimental techniques"
@@ -594,26 +580,15 @@ export function ExperimentPageClient() {
       </Expander>
       </div>
 
-      <div className="mt-6 flex flex-wrap gap-2">
-        <Button onClick={() => void onRunAgent()} disabled={loading || saving}>
-          {loading ? "Running experiment agent…" : "Run experiment agent"}
-        </Button>
-        <Button variant="secondary" onClick={() => void refresh()} disabled={loading}>
-          Refresh session
-        </Button>
-      </div>
-
       {planPreview ? (
-        <div className="mt-4">
         <Alert variant="info">
           <p className="text-sm font-semibold">Plan preview</p>
           <p className="mt-1 whitespace-pre-wrap text-sm">{planPreview}</p>
         </Alert>
-        </div>
       ) : null}
 
       {(worklist || layout || protocol) && (
-        <div className="mt-4 space-y-3">
+        <div className="mt-2 space-y-3">
           <div className="flex flex-wrap gap-2">
             {worklist ? (
               <Button
@@ -671,15 +646,72 @@ export function ExperimentPageClient() {
           ) : null}
         </div>
       )}
+    </div>
+  );
 
-      {document ? (
-        <AgentDocumentPanel
-          title="Experimental protocol"
-          markdown={document.markdown}
-          documentId={document.documentId}
-          pdfUrl={document.pdfUrl}
-        />
+  const chatInputSlot = (
+    <div className="flex gap-2">
+      <Button onClick={() => void onRunAgent()} disabled={loading || saving} fullWidth>
+        {loading ? "Running experiment agent…" : "Run experiment agent"}
+      </Button>
+      <Button variant="secondary" onClick={() => void refresh()} disabled={loading}>
+        <i className="bi bi-arrow-clockwise text-sm" aria-hidden="true" />
+      </Button>
+    </div>
+  );
+
+  const documentSlot = document ? (
+    <AgentDocumentPanel
+      title="Experimental protocol"
+      markdown={document.markdown}
+      documentId={document.documentId}
+      pdfUrl={document.pdfUrl}
+    />
+  ) : (
+    <p className="text-sm text-[var(--st-muted)]">
+      Run the agent to generate an experimental protocol.
+    </p>
+  );
+
+  const contextSlot = (
+    <div className="flex flex-col gap-2 text-sm">
+      <p className="text-[var(--st-muted)]">
+        {readiness
+          ? readiness.ready_to_run
+            ? `Ready — inputs from ${readiness.clarified_source ?? "manual"}`
+            : "Missing required inputs"
+          : "Loading session…"}
+      </p>
+      {session ? (
+        <p className="text-[var(--st-muted)]">
+          Materials: {constraints.liquid_handling.materials.join(", ") || "none"}
+        </p>
       ) : null}
-    </StreamlitPage>
+    </div>
+  );
+
+  const historySlot = (
+    <p className="text-sm text-[var(--st-muted)]">No history yet.</p>
+  );
+
+  return (
+    <AgentShell
+      title="Experiment Agent"
+      iconClass="bi-flask-fill"
+      status={loading ? "busy" : readiness?.ready_to_run ? "ready" : "error"}
+      statusLabel={loading ? "Running…" : readiness?.ready_to_run ? "Ready" : "Not ready"}
+      chatContent={chatContentSlot}
+      chatInput={chatInputSlot}
+      documentContent={documentSlot}
+      contextContent={contextSlot}
+      historyContent={historySlot}
+      onExport={
+        document?.pdfUrl
+          ? () => window.open(String(document.pdfUrl), "_blank")
+          : undefined
+      }
+      handoffLabel="→ Curve Fitting"
+      onHandoff={() => router.push("/agents/curve-fitting")}
+    />
   );
 }

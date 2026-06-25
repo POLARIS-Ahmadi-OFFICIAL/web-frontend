@@ -1,9 +1,19 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { apiPath } from "@/lib/api-path";
 
-import { Alert, Button, Expander, FormField, Metric, MetricRow, StreamlitPage, TwoCol } from "@/components/ui";
+import {
+  AgentShell,
+  Alert,
+  Button,
+  Expander,
+  FormField,
+  Metric,
+  MetricRow,
+  TwoCol,
+} from "@/components/ui";
 import { getApiBase } from "@/lib/api-base";
 import {
   getCurveFittingResults,
@@ -187,6 +197,7 @@ function WellResultCard({ well }: { well: CurveFittingWellResult }) {
 
 export function CurveFittingPageClient() {
   const token = useAccessToken();
+  const router = useRouter();
   const dataInputRef = useRef<HTMLInputElement>(null);
   const compInputRef = useRef<HTMLInputElement>(null);
   const [dataFile, setDataFile] = useState<File | null>(null);
@@ -333,13 +344,12 @@ export function CurveFittingPageClient() {
   const dataPreview = serverDataPreview ?? localDataPreview;
   const summary = results?.summary;
 
-  return (
-    <StreamlitPage
-      title="Curve Fitting"
-      icon="📈"
-      description="Upload CSV files, preview data, and run multi-peak Gaussian fitting with plots."
-      layout="wide"
-    >
+  // ── Slot definitions ──────────────────────────────────────────────────────
+
+  const chatContentSlot = (
+    <div className="flex flex-col gap-4">
+      {error ? <Alert variant="error">{error}</Alert> : null}
+
       <TwoCol>
         <FormField label="Data file (CSV)" help="Luminescence measurement data">
           <input
@@ -381,25 +391,9 @@ export function CurveFittingPageClient() {
         />
       </FormField>
 
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2">
         <Button variant="secondary" onClick={() => void refreshServerPreview()} disabled={previewLoading}>
           {previewLoading ? "Loading preview…" : "Preview files on server"}
-        </Button>
-      </div>
-
-      {(dataPreview || serverCompPreview) && (
-        <div className="mt-4 rounded-lg border border-[var(--st-border)] bg-[var(--st-surface)] p-4">
-          <h4 className="mb-2 text-sm font-semibold">Data preview</h4>
-          <PreviewTable preview={dataPreview} title="Spectral data" />
-          <PreviewTable preview={serverCompPreview} title="Composition" />
-        </div>
-      )}
-
-      {error ? <Alert variant="error">{error}</Alert> : null}
-
-      <div className="mt-4 flex flex-wrap gap-2">
-        <Button onClick={() => void onRun()} disabled={loading}>
-          {loading ? "Running curve fitting…" : "Run curve fitting"}
         </Button>
         <Button
           variant="secondary"
@@ -421,34 +415,66 @@ export function CurveFittingPageClient() {
         </Button>
       </div>
 
-      {results?.wells?.length ? (
-        <div className="mt-8 space-y-4">
-          <h4 className="text-sm font-semibold">Analysis summary</h4>
-          <MetricRow>
-            <Metric label="Wells analyzed" value={summary?.total_wells ?? results.wells.length} />
-            <Metric
-              label="Successful fits"
-              value={summary?.successful_fits ?? 0}
-            />
-            <Metric
-              label="Success rate"
-              value={`${summary?.success_rate_pct ?? 0}%`}
-            />
-          </MetricRow>
-
-          <h4 className="text-sm font-semibold">Analysis results</h4>
-          <div className="space-y-2">
-            {results.wells.map((w) => (
-              <WellResultCard key={`${w.well_name}-${w.read ?? ""}`} well={w} />
-            ))}
-          </div>
-        </div>
-      ) : (
-        <div className="mt-6 rounded-lg border border-dashed border-[var(--st-border)] p-6 text-center text-sm text-[var(--st-muted)]">
-          Upload files, preview your data, then run fitting to see peaks, metrics, and matplotlib plots
-          per well.
+      {(dataPreview || serverCompPreview) && (
+        <div className="rounded-lg border border-[var(--st-border)] bg-[var(--st-surface)] p-4">
+          <h4 className="mb-2 text-sm font-semibold">Data preview</h4>
+          <PreviewTable preview={dataPreview} title="Spectral data" />
+          <PreviewTable preview={serverCompPreview} title="Composition" />
         </div>
       )}
-    </StreamlitPage>
+    </div>
+  );
+
+  const chatInputSlot = (
+    <Button onClick={() => void onRun()} disabled={loading} fullWidth>
+      {loading ? "Running curve fitting…" : "Run curve fitting"}
+    </Button>
+  );
+
+  const documentSlot = results?.wells?.length ? (
+    <div className="flex flex-col gap-4">
+      <MetricRow>
+        <Metric label="Wells analyzed" value={summary?.total_wells ?? results.wells.length} />
+        <Metric label="Successful fits" value={summary?.successful_fits ?? 0} />
+        <Metric label="Success rate" value={`${summary?.success_rate_pct ?? 0}%`} />
+      </MetricRow>
+      <h4 className="text-sm font-semibold">Analysis results</h4>
+      <div className="space-y-2">
+        {results.wells.map((w) => (
+          <WellResultCard key={`${w.well_name}-${w.read ?? ""}`} well={w} />
+        ))}
+      </div>
+    </div>
+  ) : (
+    <p className="text-sm text-[var(--st-muted)]">
+      Upload files and run curve fitting to see results here.
+    </p>
+  );
+
+  const contextSlot = (
+    <div className="flex flex-col gap-2 text-sm">
+      <p className="text-[var(--st-muted)]">Data file: {(dataFile?.name ?? dataPath.trim()) || "none"}</p>
+      <p className="text-[var(--st-muted)]">Composition file: {compositionFile?.name ?? "none"}</p>
+    </div>
+  );
+
+  const historySlot = (
+    <p className="text-sm text-[var(--st-muted)]">No history yet.</p>
+  );
+
+  return (
+    <AgentShell
+      title="Curve Fitting"
+      iconClass="bi-graph-up-arrow"
+      status={loading ? "busy" : "ready"}
+      statusLabel={loading ? "Fitting…" : "Ready"}
+      chatContent={chatContentSlot}
+      chatInput={chatInputSlot}
+      documentContent={documentSlot}
+      contextContent={contextSlot}
+      historyContent={historySlot}
+      handoffLabel="→ ML Models"
+      onHandoff={() => router.push("/agents/ml-models")}
+    />
   );
 }
