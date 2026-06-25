@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { AuthNav } from "@/components/AuthNav";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -25,11 +25,23 @@ const ITEMS = [
 export function AppNav() {
   const pathname = usePathname();
   const [showAccount, setShowAccount] = useState(false);
+  const avatarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showAccount) return;
+    const handler = (e: MouseEvent) => {
+      if (avatarRef.current && !avatarRef.current.contains(e.target as Node)) {
+        setShowAccount(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [showAccount]);
 
   return (
     <nav
       aria-label="Main navigation"
-      className="st-app-nav flex flex-col items-center border-r border-[var(--st-border)] bg-[var(--st-sidebar)] py-3 gap-1"
+      className="st-app-nav w-[52px] shrink-0 flex flex-col items-center border-r border-[var(--st-border)] bg-[var(--st-sidebar)] py-3 gap-1"
     >
       {/* Logo */}
       <Link
@@ -66,10 +78,11 @@ export function AppNav() {
       </ul>
 
       {/* Account button at bottom */}
-      <div className="relative mt-auto">
+      <div ref={avatarRef} className="relative mt-auto">
         <button
           type="button"
           aria-label="Account"
+          aria-expanded={showAccount}
           title="Account"
           onClick={() => setShowAccount((v) => !v)}
           className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--st-surface-raised)] text-[var(--st-muted)] hover:text-[var(--st-text)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--st-primary)]/50"
@@ -77,7 +90,7 @@ export function AppNav() {
           <i className="bi bi-person-fill text-sm" aria-hidden="true" />
         </button>
         {showAccount && (
-          <div className="absolute bottom-10 left-10 z-50 w-56 rounded-[var(--st-radius)] border border-[var(--st-border)] bg-[var(--st-surface)] p-2 shadow-[var(--st-shadow-lg)]">
+          <div className="absolute bottom-10 left-full ml-2 z-50 w-56 rounded-[var(--st-radius)] border border-[var(--st-border)] bg-[var(--st-surface)] p-2 shadow-[var(--st-shadow-lg)]">
             <div className="mb-2 px-2">
               <ThemeToggle compact />
             </div>
