@@ -46,7 +46,7 @@ export function AgentShell({
   const [activeTab, setActiveTab] = useState<Tab>("Document");
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-[var(--st-bg)]">
+    <div className="flex h-full flex-col overflow-hidden bg-[var(--st-bg)]">
       {/* ── Top bar ── */}
       <div className="flex h-11 shrink-0 items-center gap-3 border-b border-[var(--st-border)] bg-[var(--st-surface)] px-4">
         <i className={`bi ${iconClass} text-base text-[var(--st-primary)]`} aria-hidden="true" />
@@ -121,20 +121,22 @@ export function AgentShell({
           </div>
 
           {/* Action row */}
-          <div className="flex shrink-0 items-center justify-end gap-2 border-t border-[var(--st-border)] p-3">
-            {onExport && (
-              <Button variant="secondary" onClick={onExport}>
-                <i className="bi bi-download mr-1.5 text-sm" aria-hidden="true" />
-                Export PDF
-              </Button>
-            )}
-            {handoffLabel && onHandoff && (
-              <Button variant="primary" onClick={onHandoff}>
-                {handoffLabel}
-                <i className="bi bi-arrow-right ml-1.5 text-sm" aria-hidden="true" />
-              </Button>
-            )}
-          </div>
+          {(onExport || (handoffLabel && onHandoff)) && (
+            <div className="flex shrink-0 items-center justify-end gap-2 border-t border-[var(--st-border)] p-3">
+              {onExport && (
+                <Button variant="secondary" onClick={onExport}>
+                  <i className="bi bi-download mr-1.5 text-sm" aria-hidden="true" />
+                  Export PDF
+                </Button>
+              )}
+              {handoffLabel && onHandoff && (
+                <Button variant="primary" onClick={onHandoff}>
+                  {handoffLabel}
+                  <i className="bi bi-arrow-right ml-1.5 text-sm" aria-hidden="true" />
+                </Button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
