@@ -1,0 +1,125 @@
+<h2>Split Panel — Output Panel Design</h2>
+<p class="subtitle">The right panel adapts per agent. Which content should live there for each agent? Pick the version that feels most useful.</p>
+
+<div class="section">
+  <div class="label">All agents share: chat left · output right · handoff button at bottom-right</div>
+</div>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f5f5f7;padding:14px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:11px;">
+      <!-- Agent tabs row -->
+      <div style="display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;">
+        <div style="padding:4px 10px;border-radius:20px;background:#0071e3;color:#fff;white-space:nowrap;font-size:10px;font-weight:600;">◇ Hypothesis</div>
+        <div style="padding:4px 10px;border-radius:20px;background:#f5f5f7;color:#6e6e73;white-space:nowrap;font-size:10px;">⬡ Experiment</div>
+        <div style="padding:4px 10px;border-radius:20px;background:#f5f5f7;color:#6e6e73;white-space:nowrap;font-size:10px;">⌁ Curve Fit</div>
+        <div style="padding:4px 10px;border-radius:20px;background:#f5f5f7;color:#6e6e73;white-space:nowrap;font-size:10px;">◈ ML</div>
+        <div style="padding:4px 10px;border-radius:20px;background:#f5f5f7;color:#6e6e73;white-space:nowrap;font-size:10px;">◉ Analysis</div>
+      </div>
+
+      <div style="display:flex;height:260px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+        <!-- chat -->
+        <div style="flex:1;display:flex;flex-direction:column;border-right:1px solid #e5e5ea;">
+          <div style="padding:10px 12px;border-bottom:1px solid #e5e5ea;display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-weight:600;font-size:12px;">◇ Hypothesis</div>
+            <div style="font-size:9px;background:#d1fae5;color:#065f46;padding:1px 6px;border-radius:10px;">Ready</div>
+          </div>
+          <div style="flex:1;padding:8px 10px;display:flex;flex-direction:column;gap:5px;overflow:hidden;">
+            <div style="align-self:flex-end;background:#0071e3;color:#fff;padding:5px 9px;border-radius:10px 10px 2px 10px;font-size:10px;">Enzyme + temperature study</div>
+            <div style="align-self:flex-start;background:#f5f5f7;padding:5px 9px;border-radius:10px 10px 10px 2px;font-size:10px;color:#1d1d1f;">Which enzyme and temp range?</div>
+            <div style="align-self:flex-end;background:#0071e3;color:#fff;padding:5px 9px;border-radius:10px 10px 2px 10px;font-size:10px;">Trypsin, 20–60°C</div>
+            <div style="align-self:flex-start;background:#f5f5f7;padding:5px 9px;border-radius:10px 10px 10px 2px;font-size:10px;color:#1d1d1f;">Generating hypothesis…</div>
+          </div>
+          <div style="padding:6px 8px;border-top:1px solid #e5e5ea;display:flex;gap:5px;">
+            <div style="flex:1;background:#f5f5f7;border-radius:14px;height:24px;"></div>
+            <div style="width:24px;height:24px;border-radius:50%;background:#0071e3;"></div>
+          </div>
+        </div>
+        <!-- right panel: live document -->
+        <div style="width:44%;display:flex;flex-direction:column;">
+          <div style="padding:8px 10px;border-bottom:1px solid #e5e5ea;display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-weight:600;font-size:10px;color:#1d1d1f;">Hypothesis draft</span>
+            <span style="font-size:9px;color:#6e6e73;">↻ live</span>
+          </div>
+          <div style="flex:1;padding:8px 10px;overflow:hidden;">
+            <div style="height:7px;background:#e5e5ea;border-radius:3px;margin-bottom:3px;width:88%;"></div>
+            <div style="height:7px;background:#e5e5ea;border-radius:3px;margin-bottom:3px;width:72%;"></div>
+            <div style="height:7px;background:#e5e5ea;border-radius:3px;margin-bottom:8px;width:80%;"></div>
+            <div style="font-size:9px;font-weight:600;color:#6e6e73;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Rationale</div>
+            <div style="height:6px;background:#e5e5ea;border-radius:3px;margin-bottom:3px;width:95%;"></div>
+            <div style="height:6px;background:#e5e5ea;border-radius:3px;margin-bottom:3px;width:70%;"></div>
+            <div style="height:6px;background:#e5e5ea;border-radius:3px;margin-bottom:8px;width:85%;"></div>
+            <div style="font-size:9px;font-weight:600;color:#6e6e73;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Testable prediction</div>
+            <div style="height:6px;background:#d1fae5;border-radius:3px;margin-bottom:3px;width:90%;"></div>
+            <div style="height:6px;background:#d1fae5;border-radius:3px;width:60%;"></div>
+          </div>
+          <div style="padding:6px 8px;border-top:1px solid #e5e5ea;display:flex;gap:5px;justify-content:flex-end;">
+            <div style="font-size:9px;background:#f5f5f7;border:1px solid #e5e5ea;border-radius:5px;padding:3px 7px;color:#1d1d1f;">PDF</div>
+            <div style="font-size:9px;background:#0071e3;border-radius:5px;padding:3px 7px;color:#fff;font-weight:600;">→ Experiment</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Persistent agent tabs</h3>
+      <p>Agent switcher lives above the panel — one click moves between agents. The pipeline is always visible. Output panel shows a live-updating document as the agent responds.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f5f5f7;padding:14px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:11px;">
+      <div style="display:flex;height:280px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+        <!-- chat -->
+        <div style="flex:1;display:flex;flex-direction:column;border-right:1px solid #e5e5ea;">
+          <div style="padding:10px 12px;border-bottom:1px solid #e5e5ea;">
+            <div style="font-weight:600;font-size:12px;">◇ Hypothesis Agent</div>
+            <div style="font-size:9px;color:#6e6e73;">Step 2 of 5 — Clarification</div>
+          </div>
+          <div style="flex:1;padding:8px 10px;display:flex;flex-direction:column;gap:5px;overflow:hidden;">
+            <div style="align-self:flex-end;background:#0071e3;color:#fff;padding:5px 9px;border-radius:10px 10px 2px 10px;font-size:10px;">Trypsin, 20–60°C</div>
+            <div style="background:#f5f5f7;padding:8px 10px;border-radius:10px;font-size:10px;color:#1d1d1f;border-left:2px solid #0071e3;">
+              <div style="font-weight:600;color:#0071e3;margin-bottom:3px;">Choose a direction</div>
+              <div style="display:flex;flex-direction:column;gap:3px;">
+                <div style="background:#fff;border:1px solid #0071e3;border-radius:6px;padding:3px 6px;font-size:9px;">Optimal temperature hypothesis</div>
+                <div style="background:#fff;border:1px solid #e5e5ea;border-radius:6px;padding:3px 6px;font-size:9px;">Denaturation threshold hypothesis</div>
+                <div style="background:#fff;border:1px solid #e5e5ea;border-radius:6px;padding:3px 6px;font-size:9px;">Comparative species hypothesis</div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:6px 8px;border-top:1px solid #e5e5ea;display:flex;gap:5px;">
+            <div style="flex:1;background:#f5f5f7;border-radius:14px;height:24px;"></div>
+            <div style="width:24px;height:24px;border-radius:50%;background:#0071e3;"></div>
+          </div>
+        </div>
+        <!-- right: tabbed output -->
+        <div style="width:44%;display:flex;flex-direction:column;">
+          <div style="display:flex;border-bottom:1px solid #e5e5ea;">
+            <div style="flex:1;padding:7px 8px;font-size:9px;font-weight:600;color:#0071e3;border-bottom:2px solid #0071e3;text-align:center;">Document</div>
+            <div style="flex:1;padding:7px 8px;font-size:9px;color:#6e6e73;text-align:center;">Context</div>
+            <div style="flex:1;padding:7px 8px;font-size:9px;color:#6e6e73;text-align:center;">History</div>
+          </div>
+          <div style="flex:1;padding:8px 10px;overflow:hidden;">
+            <div style="font-size:9px;font-weight:600;color:#1d1d1f;margin-bottom:5px;">Hypothesis in progress…</div>
+            <div style="height:6px;background:#e5e5ea;border-radius:3px;margin-bottom:3px;width:90%;"></div>
+            <div style="height:6px;background:#e5e5ea;border-radius:3px;margin-bottom:3px;width:75%;"></div>
+            <div style="height:6px;background:#e5e5ea;border-radius:3px;margin-bottom:8px;width:82%;"></div>
+            <div style="height:6px;background:#fef3c7;border-radius:3px;margin-bottom:3px;width:88%;"></div>
+            <div style="height:6px;background:#fef3c7;border-radius:3px;width:65%;"></div>
+          </div>
+          <div style="padding:6px 8px;border-top:1px solid #e5e5ea;display:flex;gap:5px;justify-content:flex-end;">
+            <div style="font-size:9px;background:#f5f5f7;border:1px solid #e5e5ea;border-radius:5px;padding:3px 7px;">Save</div>
+            <div style="font-size:9px;background:#0071e3;border-radius:5px;padding:3px 7px;color:#fff;font-weight:600;">→ Experiment</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Tabbed output panel</h3>
+      <p>Right panel has three tabs: Document (live output), Context (what the agent knows), History (past runs). Agent shows inline choice cards when it needs user input — no separate input box needed.</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:12px;">Click to select, or tell me in the terminal.</p>
