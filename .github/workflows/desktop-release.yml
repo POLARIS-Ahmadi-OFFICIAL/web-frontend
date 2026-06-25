@@ -42,10 +42,15 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL || '' }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY || '' }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Zip Windows installer
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem dist-electron -Filter "*.exe" | Select-Object -First 1
+          Compress-Archive -Path $exe.FullName -DestinationPath "dist-electron/POLARIS-windows-${{ github.ref_name }}.zip"
       - uses: actions/upload-artifact@v4
         with:
           name: polaris-desktop-windows
-          path: dist-electron/*.exe
+          path: dist-electron/POLARIS-windows-*.zip
 
   release:
     needs: [build-mac, build-win]
