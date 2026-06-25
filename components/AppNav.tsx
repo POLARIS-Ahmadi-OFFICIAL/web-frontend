@@ -11,6 +11,7 @@ const ITEMS = [
   { href: "/home",                  label: "Home",         icon: "bi-house-fill" },
   { href: "/dashboard",             label: "Analytics",    icon: "bi-bar-chart-fill" },
   { href: "/workflow",              label: "Workflow",     icon: "bi-diagram-3-fill" },
+  { href: "/agents/literature",     label: "Literature",   icon: "bi-journals" },
   { href: "/agents/hypothesis",     label: "Hypothesis",   icon: "bi-lightbulb-fill" },
   { href: "/agents/experiment",     label: "Experiment",   icon: "bi-flask-fill" },
   { href: "/agents/curve-fitting",  label: "Curve Fitting", icon: "bi-graph-up-arrow" },

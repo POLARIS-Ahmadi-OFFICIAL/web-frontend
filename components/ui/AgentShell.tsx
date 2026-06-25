@@ -21,6 +21,7 @@ type AgentShellProps = {
   onExport?: () => void;
   handoffLabel?: string;
   onHandoff?: () => void;
+  defaultTab?: Tab;
 };
 
 const STATUS_STYLES: Record<string, string> = {
@@ -42,8 +43,9 @@ export function AgentShell({
   onExport,
   handoffLabel,
   onHandoff,
+  defaultTab = "Document",
 }: AgentShellProps) {
-  const [activeTab, setActiveTab] = useState<Tab>("Document");
+  const [activeTab, setActiveTab] = useState<Tab>(defaultTab);
 
   return (
     <div className="flex h-full flex-col overflow-hidden bg-[var(--st-bg)]">
