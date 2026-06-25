@@ -7,7 +7,6 @@ import {
   type LiteratureJobSummary,
   type LiteratureJobDetail,
   type PaperHit,
-  cancelLiteratureJob,
   fetchLiteratureHealth,
   fetchLiteratureJobDetail,
   fetchLiteratureJobs,
