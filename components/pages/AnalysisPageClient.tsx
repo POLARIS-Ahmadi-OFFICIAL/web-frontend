@@ -4,13 +4,13 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 import {
+  AgentShell,
   Alert,
   Button,
   Expander,
   FormField,
   Metric,
   MetricRow,
-  StreamlitPage,
   TextArea,
 } from "@/components/ui";
 import { MarkdownBlock } from "@/components/ui/MarkdownBlock";
@@ -76,17 +76,12 @@ export function AnalysisPageClient() {
   const dualView = buildDualGpResultsView(session?.gp_results);
   const mcView = buildMonteCarloResultsView(session?.monte_carlo_results);
 
-  return (
-    <StreamlitPage
-      title="Analysis Agent"
-      icon="🔎"
-      description="Analyze curve fitting and ML results in relation to your hypothesis and experiments."
-      layout="wide"
-    >
+  const chatContentSlot = (
+    <div className="flex flex-col gap-3">
       {error ? <Alert variant="error">{error}</Alert> : null}
 
       {!session?.has_hypothesis ? (
-        <Alert variant="info" className="mb-4">
+        <Alert variant="info">
           Generate a hypothesis first on the{" "}
           <Link href="/agents/hypothesis" className="underline">
             Hypothesis
@@ -94,18 +89,6 @@ export function AnalysisPageClient() {
           page.
         </Alert>
       ) : null}
-
-      <FormField
-        label="Research goal"
-        help="Guides new research questions and experiment recommendations (Streamlit parity)."
-      >
-        <TextArea
-          value={researchGoal}
-          onChange={(e) => setResearchGoal(e.target.value)}
-          rows={4}
-          onBlur={() => void patchAnalysisSession(token, researchGoal)}
-        />
-      </FormField>
 
       <Expander title="Context information" defaultOpen={false}>
         <div className="grid gap-4 md:grid-cols-2">
@@ -165,7 +148,7 @@ export function AnalysisPageClient() {
           <MarkdownBlock content={session.curve_fitting_summary ?? ""} />
         </Expander>
       ) : (
-        <Alert variant="info" className="my-4">
+        <Alert variant="info">
           No curve fitting results in session. Run{" "}
           <Link href="/agents/curve-fitting" className="underline">
             Curve Fitting
@@ -174,17 +157,8 @@ export function AnalysisPageClient() {
         </Alert>
       )}
 
-      <div className="my-4 flex flex-wrap gap-2">
-        <Button disabled={loading || !session?.ready} onClick={() => void onAnalyze()}>
-          {loading ? "Analyzing…" : "Analyze results"}
-        </Button>
-        <Button variant="secondary" disabled={loading} onClick={() => void refresh()}>
-          Refresh
-        </Button>
-      </div>
-
       {parsed ? (
-        <div className="mb-4">
+        <div>
           <h3 className="mb-2 font-semibold">Key insights</h3>
           <MetricRow>
             <Metric
@@ -198,12 +172,80 @@ export function AnalysisPageClient() {
           </MetricRow>
         </div>
       ) : null}
+    </div>
+  );
 
-      {report ? (
-        <Expander title="Analysis report" defaultOpen>
-          <MarkdownBlock content={report} />
-        </Expander>
+  const chatInputSlot = (
+    <div className="flex flex-col gap-2">
+      <FormField
+        label="Research goal"
+        help="Guides new research questions and experiment recommendations (Streamlit parity)."
+      >
+        <TextArea
+          value={researchGoal}
+          onChange={(e) => setResearchGoal(e.target.value)}
+          rows={4}
+          onBlur={() => void patchAnalysisSession(token, researchGoal)}
+          disabled={loading}
+        />
+      </FormField>
+      <div className="flex flex-wrap gap-2">
+        <Button disabled={loading || !session?.ready} onClick={() => void onAnalyze()} className="flex-1">
+          {loading ? "Analyzing…" : "Analyze results"}
+        </Button>
+        <Button variant="secondary" disabled={loading} onClick={() => void refresh()}>
+          Refresh
+        </Button>
+      </div>
+    </div>
+  );
+
+  const documentSlot = report ? (
+    <Expander title="Analysis report" defaultOpen>
+      <MarkdownBlock content={report} />
+    </Expander>
+  ) : (
+    <p className="text-sm text-[var(--st-muted)]">
+      Run the analysis agent to generate a report here.
+    </p>
+  );
+
+  const contextSlot = (
+    <div className="flex flex-col gap-2 text-sm">
+      <p className="text-[var(--st-muted)]">Research goal: {researchGoal || "—"}</p>
+      {session?.has_hypothesis ? (
+        <p className="text-[var(--st-muted)]">Hypothesis: available</p>
       ) : null}
-    </StreamlitPage>
+      {session?.has_curve_fitting ? (
+        <p className="text-[var(--st-muted)]">Curve fitting: available</p>
+      ) : null}
+    </div>
+  );
+
+  const historySlot = (
+    <p className="text-sm text-[var(--st-muted)]">No history yet.</p>
+  );
+
+  return (
+    <AgentShell
+      title="Analysis Agent"
+      iconClass="bi-clipboard-data-fill"
+      status={loading ? "busy" : "ready"}
+      statusLabel={loading ? "Analysing…" : "Ready"}
+      chatContent={chatContentSlot}
+      chatInput={chatInputSlot}
+      documentContent={documentSlot}
+      contextContent={contextSlot}
+      historyContent={historySlot}
+      onExport={report ? () => {
+        const blob = new Blob([report], { type: "text/markdown" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "analysis-report.md";
+        a.click();
+        URL.revokeObjectURL(url);
+      } : undefined}
+    />
   );
 }

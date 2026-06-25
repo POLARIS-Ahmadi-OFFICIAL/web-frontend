@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import {
+  AgentShell,
   Alert,
   Button,
   Checkbox,
@@ -13,7 +15,6 @@ import {
   MetricRow,
   NumberInput,
   Select,
-  StreamlitPage,
   TextInput,
 } from "@/components/ui";
 import {
@@ -88,6 +89,7 @@ function CandidatesTable({
 
 export function MlModelsPageClient() {
   const token = useAccessToken();
+  const router = useRouter();
   const [session, setSession] = useState<MlSession | null>(null);
   const [modelChoice, setModelChoice] = useState<string>(SINGLE);
   const [autoMl, setAutoMl] = useState(false);
@@ -307,15 +309,10 @@ export function MlModelsPageClient() {
     modelChoice === MC ? (lastResult ?? session?.monte_carlo_results) : null,
   );
 
-  return (
-    <StreamlitPage
-      title="ML Models"
-      icon="🤖"
-      description="Train and compare ML models on curve fitting results, then run optimization cycles."
-      layout="wide"
-    >
+  const chatContentSlot = (
+    <div className="flex flex-col gap-4">
       {error ? <Alert variant="error">{error}</Alert> : null}
-      {success ? <Alert variant="success" className="mb-4">{success}</Alert> : null}
+      {success ? <Alert variant="success">{success}</Alert> : null}
 
       <FormField
         label="Select ML method for optimization"
@@ -334,12 +331,12 @@ export function MlModelsPageClient() {
         onChange={(e) => setAutoMl(e.target.checked)}
       />
       {autoMl ? (
-        <Alert variant="info" className="mt-2">
+        <Alert variant="info">
           Automation enabled: this model runs when curve fitting finishes in a workflow.
         </Alert>
       ) : null}
 
-      <div className="mt-6 space-y-4 rounded-lg border border-[var(--st-border)] p-4">
+      <div className="space-y-4 rounded-lg border border-[var(--st-border)] p-4">
         <h3 className="font-semibold">Data input</h3>
         <p className="text-xs text-[var(--st-muted)]">
           Results directory: {session?.latest_files.results_dir ?? "results/"}
@@ -425,7 +422,7 @@ export function MlModelsPageClient() {
       </div>
 
       {modelChoice === SINGLE ? (
-        <div className="mt-4 space-y-3 rounded-lg border border-[var(--st-border)] p-4">
+        <div className="space-y-3 rounded-lg border border-[var(--st-border)] p-4">
           <h3 className="font-semibold">Single-objective GP configuration</h3>
           <FormField label="Optimization target column">
             <TextInput value={target} onChange={(e) => setTarget(e.target.value)} />
@@ -442,7 +439,7 @@ export function MlModelsPageClient() {
       ) : null}
 
       {modelChoice === DUAL ? (
-        <div className="mt-4 space-y-4 rounded-lg border border-[var(--st-border)] p-4">
+        <div className="space-y-4 rounded-lg border border-[var(--st-border)] p-4">
           <h3 className="font-semibold">Dual-objective PyTorch GP</h3>
           <p className="text-sm text-[var(--st-muted)]">
             Trains two GPs (performance + stability) and ranks conditions by combined acquisition score.
@@ -558,7 +555,7 @@ export function MlModelsPageClient() {
       ) : null}
 
       {modelChoice === MC ? (
-        <div className="mt-4 space-y-4 rounded-lg border border-[var(--st-border)] p-4">
+        <div className="space-y-4 rounded-lg border border-[var(--st-border)] p-4">
           <h3 className="font-semibold">Monte Carlo Decision Tree (external project)</h3>
           <p className="text-sm text-[var(--st-muted)]">
             Runs <code className="text-xs">python main.py</code> in the external repo. Passes attempt count via{" "}
@@ -586,19 +583,22 @@ export function MlModelsPageClient() {
           />
         </div>
       ) : null}
+    </div>
+  );
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        <Button disabled={loading} onClick={() => void onRun()}>
-          {loading ? "Running…" : modelChoice === MC ? "Run Monte Carlo Decision Tree" : "Run ML automation"}
-        </Button>
-        <Button variant="secondary" disabled={loading} onClick={() => void saveConfig().then(refresh)}>
-          Save settings
-        </Button>
-        <Link href="/agents/analysis">
-          <Button variant="secondary">Continue to Analysis →</Button>
-        </Link>
-      </div>
+  const chatInputSlot = (
+    <div className="flex flex-wrap gap-2">
+      <Button disabled={loading} onClick={() => void onRun()} className="flex-1">
+        {loading ? "Running…" : modelChoice === MC ? "Run Monte Carlo Decision Tree" : "Run ML automation"}
+      </Button>
+      <Button variant="secondary" disabled={loading} onClick={() => void saveConfig().then(refresh)}>
+        Save settings
+      </Button>
+    </div>
+  );
 
+  const documentSlot = (
+    <div className="flex flex-col gap-3">
       {gpView ? (
         <Expander title="Single-objective GP results" defaultOpen>
           <MetricRow>
@@ -678,6 +678,46 @@ export function MlModelsPageClient() {
           <pre className="max-h-64 overflow-auto text-xs">{runOutput}</pre>
         </Expander>
       ) : null}
-    </StreamlitPage>
+
+      {!gpView && !dualView && !mcView && !runOutput ? (
+        <p className="text-sm text-[var(--st-muted)]">
+          Configure and run a model to see results here.
+        </p>
+      ) : null}
+    </div>
+  );
+
+  const contextSlot = (
+    <div className="flex flex-col gap-2 text-sm">
+      <p className="text-[var(--st-muted)]">Model: {modelChoice}</p>
+      <p className="text-[var(--st-muted)]">
+        Auto-run after curve fitting: {autoMl ? "Yes" : "No"}
+      </p>
+      {session?.ready ? (
+        <p className="text-[var(--st-muted)]">
+          Linked: {session.json_file ?? "—"}{session.csv_file ? ` + ${session.csv_file}` : ""}
+        </p>
+      ) : null}
+    </div>
+  );
+
+  const historySlot = (
+    <p className="text-sm text-[var(--st-muted)]">No history yet.</p>
+  );
+
+  return (
+    <AgentShell
+      title="ML Models"
+      iconClass="bi-cpu-fill"
+      status={loading ? "busy" : "ready"}
+      statusLabel={loading ? "Running…" : "Ready"}
+      chatContent={chatContentSlot}
+      chatInput={chatInputSlot}
+      documentContent={documentSlot}
+      contextContent={contextSlot}
+      historyContent={historySlot}
+      handoffLabel="→ Analysis"
+      onHandoff={() => router.push("/agents/analysis")}
+    />
   );
 }
