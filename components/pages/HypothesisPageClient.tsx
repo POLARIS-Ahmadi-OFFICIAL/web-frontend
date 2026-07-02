@@ -38,6 +38,7 @@ export function HypothesisPageClient() {
     documentId?: string;
     pdfUrl?: string;
   } | null>(null);
+  const [reasoningPolicy, setReasoningPolicy] = useState<string | null>(null);
   const streamedKeysRef = useRef<Set<string>>(new Set());
 
   function appendBubbles(bubbles: HypothesisBubble[] | undefined, userText?: string) {
@@ -71,6 +72,7 @@ export function HypothesisPageClient() {
       await streamHypothesisChat(token, body, {
         onProgress: (ev) => {
           if (ev.label) setLoadingLabel(ev.label);
+          if (ev.reasoning_policy) setReasoningPolicy(ev.reasoning_policy);
           appendProgressBubbles(ev.messages);
         },
         onComplete: (res) => {
@@ -293,6 +295,16 @@ export function HypothesisPageClient() {
         <span className="text-xs font-semibold uppercase tracking-wider text-[var(--st-muted)]">Stage</span>
         <p className="mt-1 text-[var(--st-text)]">{stage}</p>
       </div>
+      {process.env.NODE_ENV !== "production" && (
+        <div>
+          <span className="text-xs font-semibold uppercase tracking-wider text-[var(--st-muted)]">
+            Reasoning Policy <span className="normal-case font-normal">(dev)</span>
+          </span>
+          <p className="mt-1 font-mono text-[var(--st-text)]">
+            {reasoningPolicy ?? "—"}
+          </p>
+        </div>
+      )}
       {question && (
         <div>
           <span className="text-xs font-semibold uppercase tracking-wider text-[var(--st-muted)]">Current question</span>
