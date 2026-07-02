@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import "./globals.css";
+import "bootstrap-icons/font/bootstrap-icons.min.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,12 +31,6 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <head>
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-        />
-      </head>
       <body className="min-h-full flex flex-col bg-[var(--st-main)] text-[var(--st-text)]">
         <ThemeProvider>{children}</ThemeProvider>
       </body>
