@@ -59,7 +59,7 @@ export async function apiFetch<T>(
       ...(sendJson || (method !== "GET" && method !== "HEAD" && serializedBody !== undefined)
         ? { "Content-Type": "application/json" }
         : {}),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(token && token !== "__bypass__" ? { Authorization: `Bearer ${token}` } : {}),
       ...headers,
     },
   });
@@ -411,7 +411,7 @@ export async function postCurveFittingPreview(
   const res = await fetch(url, {
     method: "POST",
     headers: {
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(token && token !== "__bypass__" ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: form,
     signal: AbortSignal.timeout(AGENT_TIMEOUT_MS),
@@ -532,7 +532,7 @@ export async function postCurveFittingUpload(
   const res = await fetch(url, {
     method: "POST",
     headers: {
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(token && token !== "__bypass__" ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: form,
     signal: AbortSignal.timeout(AGENT_TIMEOUT_MS),
@@ -769,7 +769,7 @@ export async function postMlCompositionUpload(
   const res = await fetch(url, {
     method: "POST",
     headers: {
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(token && token !== "__bypass__" ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: form,
     signal: AbortSignal.timeout(AGENT_TIMEOUT_MS),

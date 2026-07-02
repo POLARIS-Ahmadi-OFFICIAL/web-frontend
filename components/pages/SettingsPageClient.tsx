@@ -186,7 +186,7 @@ export function SettingsPageClient() {
                     </FormField>
                   )}
                   <div className="mt-3 flex flex-wrap gap-2">
-                    <Button fullWidth onClick={saveSettings}>
+                    <Button fullWidth onClick={() => void saveSettings()}>
                       Save settings
                     </Button>
                     {apiKeyConfigured && !editing ? (
@@ -239,6 +239,7 @@ export function SettingsPageClient() {
                   onChange={(e) => setJupyterUploadEnabled(e.target.checked)}
                 />
                 <Button onClick={() => void saveJupyterSettings()}>Save Jupyter settings</Button>
+
               </div>
             ),
           },
@@ -260,13 +261,10 @@ export function SettingsPageClient() {
                 <Button
                   variant="secondary"
                   onClick={() => void handleClearCache()}
-                  disabled={cacheClearing || !token}
+                  disabled={cacheClearing}
                 >
                   {cacheClearing ? "Clearing…" : "Clear session cache"}
                 </Button>
-                {!token ? (
-                  <p className="text-sm text-[var(--st-muted)]">Sign in to clear the server session.</p>
-                ) : null}
               </div>
             ),
           },
