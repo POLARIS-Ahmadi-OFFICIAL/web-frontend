@@ -11,6 +11,7 @@ export type HypothesisStreamBody = {
   question?: string;
   choice?: string;
   experiment_id?: number;
+  reasoning_policy?: string;
 };
 
 export type HypothesisProgressEvent = {

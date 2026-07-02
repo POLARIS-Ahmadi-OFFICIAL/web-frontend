@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, session } = require("electron");
 const { spawn } = require("node:child_process");
 const net = require("node:net");
 const path = require("node:path");
@@ -108,11 +108,22 @@ async function createWindow() {
   await mainWindow.loadURL(appUrl);
 }
 
+async function setDesktopAuthCookie() {
+  await session.defaultSession.cookies.set({
+    url: appUrl,
+    name: "polaris_desktop",
+    value: "1",
+    httpOnly: true,
+    path: "/",
+  });
+}
+
 app.whenReady().then(async () => {
   try {
     if (useBundledServer) {
       await startBundledServer();
     }
+    await setDesktopAuthCookie();
     await createWindow();
   } catch (err) {
     console.error("Failed to start POLARIS desktop:", err);

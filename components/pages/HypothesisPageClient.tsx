@@ -137,7 +137,10 @@ export function HypothesisPageClient() {
 
   function onSubmitQuestion() {
     if (!question.trim() || loading) return;
-    void runChat({ action: "submit_question", question: question.trim() }, question.trim());
+    void runChat(
+      { action: "submit_question", question: question.trim(), reasoning_policy: "auto" },
+      question.trim(),
+    );
   }
 
   function onChoose(choice: string) {
