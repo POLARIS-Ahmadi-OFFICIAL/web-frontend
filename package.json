@@ -67,8 +67,11 @@
         "zip"
       ],
       "hardenedRuntime": true,
-      "gatekeeperAssess": false
+      "gatekeeperAssess": false,
+      "entitlements": "electron/build/entitlements.mac.plist",
+      "entitlementsInherit": "electron/build/entitlements.mac.plist"
     },
+    "afterSign": "electron/notarize.cjs",
     "win": {
       "target": [
         "nsis",
