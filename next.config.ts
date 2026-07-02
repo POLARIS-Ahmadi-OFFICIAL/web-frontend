@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
   output: process.env.ELECTRON_DESKTOP_BUILD === "1" ? "standalone" : undefined,
   // Keep standalone layout flat when the repo lives under a parent workspace folder.
   outputFileTracingRoot: projectRoot,
+  // Allow Electron (and other local clients) to access Next.js dev resources like HMR.
+  allowedDevOrigins: ["127.0.0.1"],
 };
 
 export default nextConfig;
