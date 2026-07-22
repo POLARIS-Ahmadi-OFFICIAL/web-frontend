@@ -4,7 +4,7 @@ import { ApiError } from "@/lib/api-client";
 import { getApiBase } from "@/lib/api-base";
 import type { HypothesisChatBubble, HypothesisChatResponse } from "@/lib/api-client";
 
-const AGENT_TIMEOUT_MS = 300_000;
+const AGENT_TIMEOUT_MS = 1_800_000;
 
 export type HypothesisStreamBody = {
   action: "submit_question" | "choose_option" | "generate_hypothesis" | "reset";

@@ -1,10 +1,10 @@
 import { type NextRequest } from "next/server";
 
 /** Hypothesis agent can take 1–3+ minutes (multiple LLM calls). */
-export const maxDuration = 300;
+export const maxDuration = 1800;
 
 const BACKEND = (process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8080").replace(/\/+$/, "");
-const PROXY_TIMEOUT_MS = 300_000;
+const PROXY_TIMEOUT_MS = 1_800_000;
 
 /** PNG and other binary responses must not pass through res.text() (corrupts bytes). */
 function isBinaryContentType(contentType: string | null): boolean {

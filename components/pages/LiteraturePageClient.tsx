@@ -6,8 +6,11 @@ import { AgentShell, Alert, Button, TextArea } from "@/components/ui";
 import {
   type LiteratureJobSummary,
   type LiteratureJobDetail,
+  type LiteratureExtractionProfile,
+  type LiteratureEvidencePacket,
   type PaperHit,
   fetchLiteratureHealth,
+  fetchLiteratureEvidencePacket,
   fetchLiteratureJobDetail,
   fetchLiteratureJobs,
   searchLiterature,
@@ -58,8 +61,18 @@ export function LiteraturePageClient() {
     "perovskite solar cell stability T80 retention"
   );
   const [maxPapers, setMaxPapers] = useState(100);
+  const [extractionProfile, setExtractionProfile] =
+    useState<LiteratureExtractionProfile>("pce_stability_modeling");
   const [launching, setLaunching] = useState(false);
   const [launchError, setLaunchError] = useState<string | null>(null);
+
+  // Evidence packet state
+  const [evidenceQuery, setEvidenceQuery] = useState(
+    "perovskite humidity stability T80"
+  );
+  const [evidencePacket, setEvidencePacket] = useState<LiteratureEvidencePacket | null>(null);
+  const [loadingEvidence, setLoadingEvidence] = useState(false);
+  const [evidenceError, setEvidenceError] = useState<string | null>(null);
 
   // Polling ref
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -116,7 +129,12 @@ export function LiteraturePageClient() {
     setLaunching(true);
     setLaunchError(null);
     try {
-      const result = await startLiteratureExtraction(token, launchQuery.trim(), maxPapers);
+      const result = await startLiteratureExtraction(
+        token,
+        launchQuery.trim(),
+        maxPapers,
+        extractionProfile,
+      );
       setSelectedJobId(result.job_id);
       // Refresh jobs list
       fetchLiteratureJobs(token).then(setJobs).catch(() => {});
@@ -125,7 +143,21 @@ export function LiteraturePageClient() {
     } finally {
       setLaunching(false);
     }
-  }, [launchQuery, maxPapers, token]);
+  }, [extractionProfile, launchQuery, maxPapers, token]);
+
+  const handleEvidencePacket = useCallback(async () => {
+    if (!evidenceQuery.trim()) return;
+    setLoadingEvidence(true);
+    setEvidenceError(null);
+    try {
+      const packet = await fetchLiteratureEvidencePacket(token, evidenceQuery.trim(), 5);
+      setEvidencePacket(packet);
+    } catch (e) {
+      setEvidenceError(e instanceof Error ? e.message : "Evidence packet failed");
+    } finally {
+      setLoadingEvidence(false);
+    }
+  }, [evidenceQuery, token]);
 
   // ── Slots ──────────────────────────────────────────────────────────────────
 
@@ -250,6 +282,19 @@ export function LiteraturePageClient() {
                        bg-[var(--st-bg)] px-2 py-1 text-sm text-[var(--st-text)]"
           />
         </div>
+        <label className="flex flex-col gap-1 text-xs text-[var(--st-muted)]">
+          Extraction profile
+          <select
+            value={extractionProfile}
+            onChange={(e) => setExtractionProfile(e.target.value as LiteratureExtractionProfile)}
+            className="rounded-[var(--st-radius-sm)] border border-[var(--st-border)]
+                       bg-[var(--st-bg)] px-2 py-1 text-sm text-[var(--st-text)]"
+          >
+            <option value="hypothesis_support">Hypothesis support</option>
+            <option value="general_literature">General literature</option>
+            <option value="pce_stability_modeling">PCE/stability modeling</option>
+          </select>
+        </label>
         {launchError && <Alert variant="error">{launchError}</Alert>}
         <Button
           variant="primary"
@@ -265,6 +310,26 @@ export function LiteraturePageClient() {
               Launch Extraction
             </>
           )}
+        </Button>
+      </div>
+
+      {/* Evidence packet form */}
+      <div className="flex flex-col gap-2 rounded-[var(--st-radius)] border border-[var(--st-border)] bg-[var(--st-surface)] p-3">
+        <p className="text-xs font-medium text-[var(--st-text)]">Hypothesis Evidence Packet</p>
+        <TextArea
+          value={evidenceQuery}
+          onChange={(e) => setEvidenceQuery(e.target.value)}
+          placeholder="Evidence query..."
+          rows={2}
+        />
+        {evidenceError && <Alert variant="error">{evidenceError}</Alert>}
+        <Button
+          variant="secondary"
+          onClick={() => void handleEvidencePacket()}
+          disabled={loadingEvidence || !evidenceQuery.trim()}
+          className="self-end"
+        >
+          {loadingEvidence ? "Building..." : "Build Packet"}
         </Button>
       </div>
 
@@ -310,9 +375,25 @@ export function LiteraturePageClient() {
       )}
     </div>
   ) : (
-    <p className="text-sm text-[var(--st-muted)]">
-      Select a job from the Context tab to view its log.
-    </p>
+    <div className="flex flex-col gap-3">
+      {evidencePacket ? (
+        <>
+          <p className="text-xs text-[var(--st-muted)]">
+            Evidence packet for: {evidencePacket.query}
+          </p>
+          <pre
+            className="max-h-[460px] overflow-auto whitespace-pre-wrap rounded-[var(--st-radius-sm)]
+                       bg-[var(--st-surface)] p-3 font-mono text-xs text-[var(--st-text-secondary)]"
+          >
+            {evidencePacket.formatted_context}
+          </pre>
+        </>
+      ) : (
+        <p className="text-sm text-[var(--st-muted)]">
+          Select a job from the Context tab to view its log, or build an evidence packet.
+        </p>
+      )}
+    </div>
   );
 
   return (
