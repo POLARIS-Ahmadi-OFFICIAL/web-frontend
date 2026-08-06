@@ -848,6 +848,19 @@ export type LiteratureJobDetail = LiteratureJobSummary & {
   return_code: number | null;
 };
 
+export type LiteratureExtractionProfile =
+  | "hypothesis_support"
+  | "general_literature"
+  | "pce_stability_modeling";
+
+export type LiteratureEvidencePacket = {
+  query: string;
+  papers: PaperHit[];
+  relationships?: Array<Record<string, unknown>>;
+  formatted_context: string;
+  provenance?: Record<string, unknown>;
+};
+
 export async function fetchLiteratureHealth(token: string | null) {
   return apiFetch<{ ok: boolean; active_jobs: string[] }>("/literature/health", { token });
 }
@@ -872,10 +885,28 @@ export async function startLiteratureExtraction(
   token: string | null,
   searchQuery: string,
   maxPapers: number,
+  extractionProfile: LiteratureExtractionProfile = "pce_stability_modeling",
 ) {
   return apiFetch<{ job_id: string; status: string }>("/literature/start_stage", {
     method: "POST",
-    body: { stage: "extract_batch", search_query: searchQuery, max_papers: maxPapers },
+    body: {
+      stage: "extract_batch",
+      search_query: searchQuery,
+      max_papers: maxPapers,
+      extraction_profile: extractionProfile,
+    },
+    token,
+  });
+}
+
+export async function fetchLiteratureEvidencePacket(
+  token: string | null,
+  query: string,
+  limit = 5,
+) {
+  return apiFetch<LiteratureEvidencePacket>("/literature/evidence_packet", {
+    method: "POST",
+    body: { query, limit },
     token,
   });
 }
