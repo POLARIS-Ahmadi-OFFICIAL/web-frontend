@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { Alert, Button, FormField, StreamlitPage, Tabs, TextInput } from "@/components/ui";
+import { OpticalSpectraPanel } from "@/components/phase-mapper/OpticalSpectraPanel";
 import { ResultTablePanel } from "@/components/phase-mapper/ResultTablePanel";
 import { RunControls } from "@/components/phase-mapper/RunControls";
 import { UploadPanel } from "@/components/phase-mapper/UploadPanel";
@@ -173,6 +174,10 @@ export function PhaseMapperPageClient() {
                           emptyMessage="No remeasurement recommendations for this run."
                         />
                       ),
+                    },
+                    {
+                      label: "Optical Spectra",
+                      content: <OpticalSpectraPanel runId={selectedRun.id} />,
                     },
                   ]}
                   scrollable
