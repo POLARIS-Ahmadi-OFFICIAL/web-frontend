@@ -2,6 +2,8 @@ import { apiFetch, ApiError } from "@/lib/api-client";
 import { apiPath } from "@/lib/api-path";
 import { getApiBase } from "@/lib/api-base";
 
+const AGENT_TIMEOUT_MS = 300_000;
+
 export type PhaseMapperLibrary = {
   id: number;
   user_id: string;
@@ -65,11 +67,21 @@ export async function uploadPhaseMapperFile(
 ): Promise<PhaseMapperUploadResult> {
   const form = new FormData();
   form.append("file", file, file.name);
-  return apiFetch<PhaseMapperUploadResult>(`/phase-mapper/libraries/${libraryId}/uploads/${kind}`, {
+
+  const url = `${getApiBase()}${apiPath(`/phase-mapper/libraries/${libraryId}/uploads/${kind}`)}`;
+  const res = await fetch(url, {
     method: "POST",
+    headers: {
+      ...(token && token !== "__bypass__" ? { Authorization: `Bearer ${token}` } : {}),
+    },
     body: form,
-    token,
+    signal: AbortSignal.timeout(AGENT_TIMEOUT_MS),
   });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new ApiError(text || res.statusText, res.status);
+  }
+  return res.json() as Promise<PhaseMapperUploadResult>;
 }
 
 export async function startPhaseMapperRun(token: string | null, libraryId: number): Promise<PhaseMapperRun> {

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { Alert, Button, FormField, StreamlitPage, TextInput } from "@/components/ui";
+import { UploadPanel } from "@/components/phase-mapper/UploadPanel";
 import {
   createPhaseMapperLibrary,
   listPhaseMapperLibraries,
@@ -17,6 +18,7 @@ export function PhaseMapperPageClient() {
   const [newLibraryName, setNewLibraryName] = useState("");
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploadNotice, setUploadNotice] = useState<string | null>(null);
 
   const loadLibraries = useCallback(async () => {
     if (!token) return;
@@ -98,11 +100,16 @@ export function PhaseMapperPageClient() {
           </div>
         </div>
 
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 space-y-4">
           {selectedLibrary ? (
-            <p className="text-sm text-[var(--st-muted)]">
-              Selected: {selectedLibrary.name} (uploads and run controls arrive in later tasks)
-            </p>
+            <>
+              <h3 className="text-sm font-semibold text-[var(--st-text)]">{selectedLibrary.name}</h3>
+              {uploadNotice ? <Alert variant="success">{uploadNotice}</Alert> : null}
+              <UploadPanel
+                libraryId={selectedLibrary.id}
+                onUploaded={() => setUploadNotice("Upload received. Run the pipeline when ready.")}
+              />
+            </>
           ) : (
             <p className="text-sm text-[var(--st-muted)]">Select or create a library to get started.</p>
           )}
