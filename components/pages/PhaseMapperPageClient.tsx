@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { Alert, Button, FormField, StreamlitPage, Tabs, TextInput } from "@/components/ui";
 import { HeatmapPanel } from "@/components/phase-mapper/HeatmapPanel";
+import { LibraryRunsPanel } from "@/components/phase-mapper/LibraryRunsPanel";
 import { OpticalSpectraPanel } from "@/components/phase-mapper/OpticalSpectraPanel";
 import { ResultTablePanel } from "@/components/phase-mapper/ResultTablePanel";
 import { RunControls } from "@/components/phase-mapper/RunControls";
@@ -183,6 +184,16 @@ export function PhaseMapperPageClient() {
                     {
                       label: "Heatmaps",
                       content: <HeatmapPanel runId={selectedRun.id} />,
+                    },
+                    {
+                      label: "Library Runs",
+                      content: (
+                        <LibraryRunsPanel
+                          libraryId={selectedLibrary.id}
+                          selectedRunId={selectedRun.id}
+                          onSelectRun={setSelectedRun}
+                        />
+                      ),
                     },
                   ]}
                   scrollable
