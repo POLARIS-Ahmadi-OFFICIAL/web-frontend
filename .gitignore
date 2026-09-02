@@ -94,3 +94,4 @@ test-results/
 # Miscellaneous
 *.tgz
 .vercel
+.worktrees/
