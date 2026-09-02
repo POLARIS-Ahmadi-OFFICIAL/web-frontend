@@ -3,11 +3,14 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { Alert, Button, FormField, StreamlitPage, TextInput } from "@/components/ui";
+import { RunControls } from "@/components/phase-mapper/RunControls";
 import { UploadPanel } from "@/components/phase-mapper/UploadPanel";
 import {
   createPhaseMapperLibrary,
   listPhaseMapperLibraries,
+  listPhaseMapperRuns,
   type PhaseMapperLibrary,
+  type PhaseMapperRun,
 } from "@/lib/phase-mapper-api-client";
 import { useAccessToken } from "@/lib/use-access-token";
 
@@ -19,6 +22,7 @@ export function PhaseMapperPageClient() {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploadNotice, setUploadNotice] = useState<string | null>(null);
+  const [selectedRun, setSelectedRun] = useState<PhaseMapperRun | null>(null);
 
   const loadLibraries = useCallback(async () => {
     if (!token) return;
@@ -52,6 +56,18 @@ export function PhaseMapperPageClient() {
 
   const selectedLibrary = libraries.find((l) => l.id === selectedLibraryId) ?? null;
 
+  async function onSelectLibrary(libraryId: number) {
+    setSelectedLibraryId(libraryId);
+    setUploadNotice(null);
+    setSelectedRun(null);
+    try {
+      const runs = await listPhaseMapperRuns(token, libraryId);
+      setSelectedRun(runs[0] ?? null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to load run history");
+    }
+  }
+
   return (
     <StreamlitPage
       title="Phase Mapper"
@@ -84,7 +100,7 @@ export function PhaseMapperPageClient() {
                   <li key={lib.id}>
                     <button
                       type="button"
-                      onClick={() => setSelectedLibraryId(lib.id)}
+                      onClick={() => void onSelectLibrary(lib.id)}
                       className={`w-full rounded-[var(--st-radius-sm)] px-3 py-2 text-left text-sm transition ${
                         lib.id === selectedLibraryId
                           ? "bg-[var(--st-nav-active-bg)] text-[var(--st-nav-active-text)]"
@@ -109,6 +125,7 @@ export function PhaseMapperPageClient() {
                 libraryId={selectedLibrary.id}
                 onUploaded={() => setUploadNotice("Upload received. Run the pipeline when ready.")}
               />
+              <RunControls libraryId={selectedLibrary.id} run={selectedRun} onRunChanged={setSelectedRun} />
             </>
           ) : (
             <p className="text-sm text-[var(--st-muted)]">Select or create a library to get started.</p>
