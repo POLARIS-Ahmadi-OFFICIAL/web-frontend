@@ -16,6 +16,7 @@ const ITEMS = [
   { href: "/agents/experiment",     label: "Experiment",   icon: "bi-flask-fill" },
   { href: "/agents/curve-fitting",  label: "Curve Fitting", icon: "bi-graph-up-arrow" },
   { href: "/agents/ml-models",      label: "ML Models",    icon: "bi-cpu-fill" },
+  { href: "/phase-mapper",          label: "Phase Mapper", icon: "bi-grid-3x3-gap-fill" },
   { href: "/agents/analysis",       label: "Analysis",     icon: "bi-clipboard-data-fill" },
   { href: "/tools/watcher",         label: "Watcher",      icon: "bi-eye-fill" },
   { href: "/tools/mcp",             label: "MCP",          icon: "bi-link-45deg" },
