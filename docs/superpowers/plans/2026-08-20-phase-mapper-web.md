@@ -21,8 +21,11 @@
 
 ## Dev environment for manual verification (every task)
 
-Backend: from `backend-api`, `AUTH_DISABLED=true uvicorn app.main:app --reload --port 8080` (or whatever the repo's own `.env`/README quick-start already sets up — `AUTH_DISABLED=true` is backend-api's documented dev default, so it may already be your default and not need restating).
-Frontend: from `web-frontend`, `npm run dev`, then visit `http://localhost:3000/phase-mapper`.
+Backend: from `backend-api`, `AUTH_DISABLED=true uvicorn app.main:app --reload --port 8080` (or whatever the repo's own `.env`/README quick-start already sets up — `AUTH_DISABLED=true` is backend-api's documented dev default, so it may already be your default and not need restating). Already running in the background for this plan's execution at `http://127.0.0.1:8080` — confirm with `curl -s http://127.0.0.1:8080/api/v1/health` before assuming you need to start it yourself.
+Frontend: from `web-frontend`, `npm run dev`. Already running in the background for this plan's execution at `http://127.0.0.1:3000` — confirm with `curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:3000/login` (expect `200`) before starting your own.
+
+**One-time browser prerequisite, separate from the backend's `AUTH_DISABLED`:** this frontend has its own auth-gating middleware (`lib/supabase/middleware.ts`) that redirects every page to `/login` unless either Supabase is configured (it isn't, in this dev setup — `.env.local` has empty `NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_ANON_KEY`) or a `polaris_dev_bypass=1` cookie is present. Before any manual browser verification, visit `http://127.0.0.1:3000/login` once and click the "Skip (dev only)" button — this sets that cookie for 24 hours in that browser profile. Without it, every page (including `/phase-mapper`) redirects to `/login` and looks broken even though nothing is actually wrong.
+
 Fixtures: `backend-api/tests/phase_mapper/fixtures/composition_map_fixture.csv` and `plate_reader_fixture.csv` (already exist, from the backend plan's e2e test) are real, valid inputs to upload during manual verification.
 
 ---
