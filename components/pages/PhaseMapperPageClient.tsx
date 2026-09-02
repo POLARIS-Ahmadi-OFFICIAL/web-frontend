@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { Alert, Button, FormField, StreamlitPage, Tabs, TextInput } from "@/components/ui";
+import { DownloadPanel } from "@/components/phase-mapper/DownloadPanel";
 import { HeatmapPanel } from "@/components/phase-mapper/HeatmapPanel";
 import { LibraryRunsPanel } from "@/components/phase-mapper/LibraryRunsPanel";
 import { OpticalSpectraPanel } from "@/components/phase-mapper/OpticalSpectraPanel";
@@ -194,6 +195,10 @@ export function PhaseMapperPageClient() {
                           onSelectRun={setSelectedRun}
                         />
                       ),
+                    },
+                    {
+                      label: "Downloads",
+                      content: <DownloadPanel runId={selectedRun.id} />,
                     },
                   ]}
                   scrollable
