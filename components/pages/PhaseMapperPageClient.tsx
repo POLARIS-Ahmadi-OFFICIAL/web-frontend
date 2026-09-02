@@ -131,10 +131,16 @@ export function PhaseMapperPageClient() {
               <h3 className="text-sm font-semibold text-[var(--st-text)]">{selectedLibrary.name}</h3>
               {uploadNotice ? <Alert variant="success">{uploadNotice}</Alert> : null}
               <UploadPanel
+                key={`upload-${selectedLibrary.id}`}
                 libraryId={selectedLibrary.id}
                 onUploaded={() => setUploadNotice("Upload received. Run the pipeline when ready.")}
               />
-              <RunControls libraryId={selectedLibrary.id} run={selectedRun} onRunChanged={setSelectedRun} />
+              <RunControls
+                key={`run-controls-${selectedLibrary.id}`}
+                libraryId={selectedLibrary.id}
+                run={selectedRun}
+                onRunChanged={setSelectedRun}
+              />
               {selectedRun && selectedRun.status === "succeeded" ? (
                 <Tabs
                   items={[
@@ -193,6 +199,9 @@ export function PhaseMapperPageClient() {
                           libraryId={selectedLibrary.id}
                           selectedRunId={selectedRun.id}
                           onSelectRun={setSelectedRun}
+                          onRunDeleted={(runId) => {
+                            if (selectedRun?.id === runId) setSelectedRun(null);
+                          }}
                         />
                       ),
                     },
@@ -203,6 +212,10 @@ export function PhaseMapperPageClient() {
                   ]}
                   scrollable
                 />
+              ) : selectedRun ? (
+                <Alert variant="info">
+                  Run #{selectedRun.id} is {selectedRun.status} — no results to display yet.
+                </Alert>
               ) : null}
             </>
           ) : (

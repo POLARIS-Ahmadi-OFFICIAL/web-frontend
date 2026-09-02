@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { Alert, Select } from "@/components/ui";
+import { Alert, FormField, Select } from "@/components/ui";
 import { getPhaseMapperOpticalSpectra } from "@/lib/phase-mapper-api-client";
 import { useAccessToken } from "@/lib/use-access-token";
 
@@ -23,6 +23,7 @@ export function OpticalSpectraPanel({ runId }: { runId: number }) {
     let cancelled = false;
     setRows(null);
     setError(null);
+    setHoverIndex(null);
     getPhaseMapperOpticalSpectra(token, runId)
       .then((data) => {
         if (cancelled) return;
@@ -76,11 +77,16 @@ export function OpticalSpectraPanel({ runId }: { runId: number }) {
   return (
     <div className="space-y-4">
       <div className="max-w-xs">
-        <Select
-          value={selectedWell}
-          onChange={(e) => setSelectedWell(e.target.value)}
-          options={wells.map((w) => ({ value: w, label: w }))}
-        />
+        <FormField label="Well">
+          <Select
+            value={selectedWell}
+            onChange={(e) => {
+              setSelectedWell(e.target.value);
+              setHoverIndex(null);
+            }}
+            options={wells.map((w) => ({ value: w, label: w }))}
+          />
+        </FormField>
       </div>
       {points.length === 0 ? (
         <p className="text-sm text-[var(--st-muted)]">No spectrum points for this well.</p>

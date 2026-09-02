@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { Alert, Select } from "@/components/ui";
+import { Alert, FormField, Select } from "@/components/ui";
 import { getPhaseMapperHeatmaps, type PhaseMapperHeatmaps } from "@/lib/phase-mapper-api-client";
 import { useAccessToken } from "@/lib/use-access-token";
 
@@ -83,14 +83,16 @@ export function HeatmapPanel({ runId }: { runId: number }) {
   return (
     <div className="space-y-4">
       <div className="max-w-sm">
-        <Select
-          value={metric}
-          onChange={(e) => {
-            setMetric(e.target.value);
-            setHovered(null);
-          }}
-          options={data.columns.map((c) => ({ value: c, label: c }))}
-        />
+        <FormField label="Metric">
+          <Select
+            value={metric}
+            onChange={(e) => {
+              setMetric(e.target.value);
+              setHovered(null);
+            }}
+            options={data.columns.map((c) => ({ value: c, label: c }))}
+          />
+        </FormField>
       </div>
       <div className="flex items-center gap-2 text-xs text-[var(--st-muted)]">
         <span
@@ -138,7 +140,7 @@ export function HeatmapPanel({ runId }: { runId: number }) {
               const value = wellValues.get(wellId);
               const step = value == null ? null : stepForValue(value, min, max);
               const fill = step == null ? "var(--st-hover)" : SEQUENTIAL_RAMP[step];
-              const textColor = step != null && step >= DARK_TEXT_FROM_STEP ? "#ffffff" : "#0b0b0b";
+              const textColor = step != null && step >= DARK_TEXT_FROM_STEP ? "#ffffff" : "#000000";
               return (
                 <g
                   key={wellId}

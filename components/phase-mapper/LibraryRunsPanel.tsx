@@ -10,10 +10,12 @@ export function LibraryRunsPanel({
   libraryId,
   selectedRunId,
   onSelectRun,
+  onRunDeleted,
 }: {
   libraryId: number;
   selectedRunId: number | null;
   onSelectRun: (run: PhaseMapperRun) => void;
+  onRunDeleted?: (runId: number) => void;
 }) {
   const token = useAccessToken();
   const [runs, setRuns] = useState<PhaseMapperRun[] | null>(null);
@@ -39,6 +41,7 @@ export function LibraryRunsPanel({
     try {
       await deletePhaseMapperRun(token, runId);
       await load();
+      onRunDeleted?.(runId);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to delete run");
     }
