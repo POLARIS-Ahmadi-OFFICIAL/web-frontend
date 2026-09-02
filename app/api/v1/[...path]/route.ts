@@ -13,7 +13,8 @@ function isBinaryContentType(contentType: string | null): boolean {
   return (
     ct.startsWith("image/") ||
     ct.startsWith("application/octet-stream") ||
-    ct.startsWith("application/pdf")
+    ct.startsWith("application/pdf") ||
+    ct.startsWith("application/zip")
   );
 }
 

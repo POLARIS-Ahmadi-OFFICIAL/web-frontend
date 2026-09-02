@@ -55,7 +55,7 @@ export function PhaseMapperPageClient() {
       const lib = await createPhaseMapperLibrary(token, newLibraryName.trim());
       setNewLibraryName("");
       await loadLibraries();
-      setSelectedLibraryId(lib.id);
+      await onSelectLibrary(lib.id);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to create library");
     } finally {
