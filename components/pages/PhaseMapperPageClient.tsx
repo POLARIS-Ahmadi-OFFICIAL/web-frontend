@@ -2,11 +2,16 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { Alert, Button, FormField, StreamlitPage, TextInput } from "@/components/ui";
+import { Alert, Button, FormField, StreamlitPage, Tabs, TextInput } from "@/components/ui";
+import { ResultTablePanel } from "@/components/phase-mapper/ResultTablePanel";
 import { RunControls } from "@/components/phase-mapper/RunControls";
 import { UploadPanel } from "@/components/phase-mapper/UploadPanel";
 import {
   createPhaseMapperLibrary,
+  getPhaseMapperPredictions,
+  getPhaseMapperReads,
+  getPhaseMapperRemeasurement,
+  getPhaseMapperXrdRecommendations,
   listPhaseMapperLibraries,
   listPhaseMapperRuns,
   type PhaseMapperLibrary,
@@ -126,6 +131,53 @@ export function PhaseMapperPageClient() {
                 onUploaded={() => setUploadNotice("Upload received. Run the pipeline when ready.")}
               />
               <RunControls libraryId={selectedLibrary.id} run={selectedRun} onRunChanged={setSelectedRun} />
+              {selectedRun && selectedRun.status === "succeeded" ? (
+                <Tabs
+                  items={[
+                    {
+                      label: "Reads",
+                      content: (
+                        <ResultTablePanel
+                          runId={selectedRun.id}
+                          fetchRecords={getPhaseMapperReads}
+                          emptyMessage="No reads parsed for this run."
+                        />
+                      ),
+                    },
+                    {
+                      label: "Predictions",
+                      content: (
+                        <ResultTablePanel
+                          runId={selectedRun.id}
+                          fetchRecords={getPhaseMapperPredictions}
+                          emptyMessage="No predictions available for this run."
+                        />
+                      ),
+                    },
+                    {
+                      label: "XRD Recommendations",
+                      content: (
+                        <ResultTablePanel
+                          runId={selectedRun.id}
+                          fetchRecords={getPhaseMapperXrdRecommendations}
+                          emptyMessage="No XRD recommendations for this run."
+                        />
+                      ),
+                    },
+                    {
+                      label: "Remeasurement",
+                      content: (
+                        <ResultTablePanel
+                          runId={selectedRun.id}
+                          fetchRecords={getPhaseMapperRemeasurement}
+                          emptyMessage="No remeasurement recommendations for this run."
+                        />
+                      ),
+                    },
+                  ]}
+                  scrollable
+                />
+              ) : null}
             </>
           ) : (
             <p className="text-sm text-[var(--st-muted)]">Select or create a library to get started.</p>
