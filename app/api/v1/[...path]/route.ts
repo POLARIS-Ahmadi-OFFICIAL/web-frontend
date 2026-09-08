@@ -1,7 +1,7 @@
 import { type NextRequest } from "next/server";
 
-/** Hypothesis agent can take 1–3+ minutes (multiple LLM calls). */
-export const maxDuration = 1800;
+/** Hypothesis agent can take 1–3+ minutes (multiple LLM calls). Vercel's hard ceiling is 800s (Enterprise + Fluid); 300 is the safe max here. */
+export const maxDuration = 300;
 
 const BACKEND = (process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8080").replace(/\/+$/, "");
 const PROXY_TIMEOUT_MS = 1_800_000;
