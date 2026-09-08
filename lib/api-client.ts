@@ -917,3 +917,21 @@ export async function cancelLiteratureJob(token: string | null, jobId: string) {
     token,
   });
 }
+
+export type FeedbackCategory = "bug" | "feature" | "other";
+
+export async function submitFeedback(
+  token: string | null,
+  body: {
+    message: string;
+    category: FeedbackCategory;
+    app_context: { version?: string; platform?: string; is_desktop: boolean; url?: string };
+    console_errors: string[];
+  },
+) {
+  return apiFetch<{ status: string }>("/feedback", {
+    method: "POST",
+    body,
+    token,
+  });
+}

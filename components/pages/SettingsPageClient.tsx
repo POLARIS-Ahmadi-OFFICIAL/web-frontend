@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+import { FeedbackForm } from "@/components/FeedbackForm";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   Alert,
@@ -265,6 +266,18 @@ export function SettingsPageClient() {
                 >
                   {cacheClearing ? "Clearing…" : "Clear session cache"}
                 </Button>
+              </div>
+            ),
+          },
+          {
+            label: "Feedback",
+            content: (
+              <div className="space-y-4">
+                <p className="text-sm leading-relaxed text-[var(--st-muted)]">
+                  Found a bug or have an idea? This goes straight to the POLARIS maintainer&apos;s
+                  inbox, along with your app version and any recent errors.
+                </p>
+                <FeedbackForm />
               </div>
             ),
           },
