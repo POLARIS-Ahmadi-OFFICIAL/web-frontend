@@ -72,6 +72,13 @@
       "entitlements": "electron/build/entitlements.mac.plist",
       "entitlementsInherit": "electron/build/entitlements.mac.plist"
     },
+    "dmg": {
+      "contents": [
+        { "x": 130, "y": 220 },
+        { "x": 410, "y": 220, "type": "link", "path": "/Applications" },
+        { "x": 270, "y": 60, "type": "file", "path": "electron/build/Fix POLARIS.command" }
+      ]
+    },
     "afterSign": "electron/notarize.cjs",
     "win": {
       "target": [

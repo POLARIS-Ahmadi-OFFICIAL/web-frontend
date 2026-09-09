@@ -95,5 +95,6 @@ The workflow uploads macOS and Windows artifacts to the GitHub Release (requires
 ## Notes
 
 - **Code signing**: macOS/Windows may warn on unsigned builds. For distribution, add Apple Developer / Authenticode certificates in `electron-builder` config.
+- **Unsigned macOS builds**: until the app is notarized, the DMG includes a **"Fix POLARIS.command"** helper next to the app and the Applications shortcut. If macOS says POLARIS "cannot be opened because the developer cannot be verified" (or "is damaged"), drag POLARIS into Applications first, then double-click the helper once — it runs `xattr -cr` to clear the quarantine flag so the app opens normally after that. This can't run automatically from inside the app itself: Gatekeeper blocks a quarantined app's own code from executing before the user overrides it, so a separate one-time step is unavoidable without real notarization.
 - **Auto-update**: set `ELECTRON_AUTO_UPDATE=true` and configure `publish` in `package.json` when you publish to GitHub Releases.
 - **Size**: The installer includes the Next standalone `node_modules` bundle (~hundreds of MB).

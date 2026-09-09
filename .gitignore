@@ -7,7 +7,7 @@ node_modules/
 .next/
 .next/electron-standalone/
 out/
-build/
+/build/
 
 # Production
 dist/
