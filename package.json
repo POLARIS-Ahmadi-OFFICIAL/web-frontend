@@ -60,6 +60,7 @@
       }
     ],
     "asar": true,
+    "afterPack": "electron/after-pack.cjs",
     "mac": {
       "category": "public.app-category.education",
       "target": [
