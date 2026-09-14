@@ -16,23 +16,32 @@ function hasAuthBypass(request: NextRequest) {
 
 export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+  const bypass = hasAuthBypass(request);
 
   if (pathname === "/") {
     const redirect = request.nextUrl.clone();
-    redirect.pathname = hasAuthBypass(request) ? "/home" : "/login";
+    redirect.pathname = bypass ? "/home" : "/login";
     return NextResponse.redirect(redirect);
   }
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (!url || !key) {
-    if (!isPublicPath(pathname) && !hasAuthBypass(request)) {
+  // Desktop (and the dev bypass) never talk to Supabase — even if URL/key
+  // happen to be baked in — so a request never blocks on reaching it.
+  if (!url || !key || bypass) {
+    if (!isPublicPath(pathname) && !bypass) {
       const redirect = request.nextUrl.clone();
       redirect.pathname = "/login";
       if (pathname !== "/login") {
         redirect.searchParams.set("next", pathname);
       }
+      return NextResponse.redirect(redirect);
+    }
+    if (bypass && pathname === "/login") {
+      const redirect = request.nextUrl.clone();
+      redirect.pathname = request.nextUrl.searchParams.get("next") || "/home";
+      redirect.searchParams.delete("next");
       return NextResponse.redirect(redirect);
     }
     return NextResponse.next({ request });

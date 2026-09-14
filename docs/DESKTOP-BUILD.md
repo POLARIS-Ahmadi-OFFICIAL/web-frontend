@@ -11,19 +11,19 @@ The desktop build bundles the **Next.js standalone server** inside Electron. On 
 
 ## Configure before build
 
-Bake production URLs into the client at build time:
+The desktop app never uses Supabase — Electron sets an httpOnly `polaris_desktop`
+cookie on launch that bypasses the web login flow entirely, and the app talks to
+the backend with `AUTH_DISABLED=true` (the backend's default; it uses local
+SQLite, not Supabase, either way). **Do not set `NEXT_PUBLIC_SUPABASE_URL` /
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` when building desktop** — the client and
+middleware actively skip Supabase for desktop regardless, but baking those in
+just adds a codepath teammates can hit accidentally with no benefit.
+
+Only the backend URL needs to be baked in:
 
 ```bash
 export NEXT_PUBLIC_API_URL=https://your-api.up.railway.app
-export NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
-export NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-# Optional: default login redirect base (desktop uses 127.0.0.1 at runtime)
-export NEXT_PUBLIC_APP_URL=http://127.0.0.1:3000
 ```
-
-Add Supabase redirect URL for desktop (use the port shown in dev, or configure after first run):
-
-- `http://127.0.0.1:<port>/auth/callback` (port is chosen dynamically in the packaged app)
 
 For local backend testing:
 

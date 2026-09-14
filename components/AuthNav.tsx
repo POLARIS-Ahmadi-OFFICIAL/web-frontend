@@ -8,7 +8,12 @@ import { createClient } from "@/lib/supabase/client";
 
 export function AuthNav() {
   const [email, setEmail] = useState<string | null>(null);
+  const [isDesktop, setIsDesktop] = useState(false);
   const supabase = createClient();
+
+  useEffect(() => {
+    setIsDesktop(Boolean(window.polaris?.isDesktop));
+  }, []);
 
   useEffect(() => {
     if (!supabase) return;
@@ -29,6 +34,9 @@ export function AuthNav() {
   }
 
   if (!supabase) {
+    // Desktop runs entirely against the local backend with auth disabled —
+    // there's no Supabase account to sign into, so show nothing here.
+    if (isDesktop) return null;
     return (
       <Link href="/login" className="px-3 text-xs text-[var(--st-muted)] hover:text-[var(--st-text)]">
         Sign in

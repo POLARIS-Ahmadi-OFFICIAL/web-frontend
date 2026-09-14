@@ -5,9 +5,11 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 function isDesktopBypass() {
+  // polaris_desktop is set httpOnly by Electron's main process, so it's never
+  // visible to document.cookie here — window.polaris is the reliable signal.
+  if (typeof window !== "undefined" && window.polaris?.isDesktop) return true;
   if (typeof document === "undefined") return false;
-  return document.cookie.split(";").some((c) => c.trim().startsWith("polaris_desktop=1")) ||
-    document.cookie.split(";").some((c) => c.trim().startsWith("polaris_dev_bypass=1"));
+  return document.cookie.split(";").some((c) => c.trim().startsWith("polaris_dev_bypass=1"));
 }
 
 export function useAccessToken() {
