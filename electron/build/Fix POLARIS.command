@@ -16,7 +16,7 @@ if [ ! -d "$APP" ]; then
 fi
 
 echo "Fixing $APP..."
-xattr -cr "$APP"
+sudo xattr -cr "$APP"
 
 if [ $? -eq 0 ]; then
   echo "Done. You can now open POLARIS normally from Applications."
