@@ -62,16 +62,13 @@
     "asar": true,
     "afterPack": "electron/after-pack.cjs",
     "mac": {
-      "category": "public.app-category.education",
       "target": [
         "dmg",
         "zip"
       ],
       "identity": "-",
       "hardenedRuntime": false,
-      "gatekeeperAssess": false,
-      "entitlements": "electron/build/entitlements.mac.plist",
-      "entitlementsInherit": "electron/build/entitlements.mac.plist"
+      "gatekeeperAssess": false
     },
     "dmg": {
       "contents": [
