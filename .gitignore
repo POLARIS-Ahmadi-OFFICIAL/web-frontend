@@ -95,3 +95,6 @@ test-results/
 *.tgz
 .vercel
 .worktrees/
+
+# Local Claude Code worktrees and settings
+.claude/
