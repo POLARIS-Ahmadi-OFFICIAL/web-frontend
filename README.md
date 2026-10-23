@@ -1,8 +1,12 @@
 # web-frontend
 
-POLARIS web UI (Next.js) and desktop shell (Electron).
+POLARIS web UI (Next.js) and desktop app (Electron).
+
+New to POLARIS? Start with the [onboarding guide](https://github.com/POLARIS-Ahmadi-OFFICIAL/.github/blob/main/ONBOARDING.md).
 
 ## Development
+
+Requires **Node.js 22+**.
 
 ```bash
 npm install
@@ -10,55 +14,72 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open http://localhost:3000 — requires [backend-api](../backend-api) on port 8080 for live health check.
+`.env.example` points at the production API on Render. For local work set `NEXT_PUBLIC_API_URL=http://127.0.0.1:8080` in `.env.local`.
+
+Open http://127.0.0.1:3000. Live data needs [backend-api](https://github.com/POLARIS-Ahmadi-OFFICIAL/backend-api) on port 8080.
 
 ### Run API + web + mobile together
 
-From this repo (starts backend on :8080, Next on :3000, Expo):
+Clone `backend-api` and `mobile-development` next to this repo, create the backend venv (`cd ../backend-api && python3.12 -m venv .venv && .venv/bin/pip install -e ".[dev]"`), then:
 
 ```bash
-# Ensure backend venv exists: cd ../backend-api && python3 -m venv .venv && pip install -e ".[dev]"
 npm run dev:stack
 ```
 
-## Production (Vercel + Railway)
+This starts the API on `:8080`, Next on `:3000`, and Expo, with prefixed logs.
 
-Vercel hosts this app only. Deploy the API separately — see [backend-api/docs/DEPLOY-RAILWAY.md](../backend-api/docs/DEPLOY-RAILWAY.md).
+### Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Next dev server on 127.0.0.1:3000 |
+| `npm run lint` | ESLint (runs in CI) |
+| `npm run build` | Production build (runs in CI) |
+| `npm run dev:stack` | API + web + mobile together |
+| `npm run dev:desktop` | Next dev + Electron window |
+| `npm run build:desktop:mac` / `:win` | Desktop installers (see below) |
+
+## App layout
+
+| Path | Contents |
+|------|----------|
+| `app/(auth)/`, `app/auth/` | Login page and Supabase OAuth callback |
+| `app/(app)/` | Signed-in pages: `home`, `dashboard` (Analytics), `workflow`, `agents/*` (literature, hypothesis, experiment, curve-fitting, ml-models, analysis), `phase-mapper`, `tools/watcher`, `tools/mcp`, `settings`, `history` |
+| `components/` | Shared UI; `AppNav.tsx` defines the sidebar |
+| `lib/` | API client helpers (`api-path.ts` mirrors the shared-types contract), Supabase setup |
+| `electron/` | Desktop main process, packaging resources, macOS Gatekeeper helper |
+| `scripts/` | dev-stack and desktop build scripts |
+| `docs/superpowers/` | Design specs and implementation plans for major features |
+
+## Production (Vercel + Render)
+
+Vercel hosts this app only. The API runs on Render; see [backend-api/docs/DEPLOY.md](https://github.com/POLARIS-Ahmadi-OFFICIAL/backend-api/blob/main/docs/DEPLOY.md).
 
 In Vercel → **Environment Variables**:
 
 ```bash
-NEXT_PUBLIC_API_URL=https://<your-railway-domain>
+NEXT_PUBLIC_API_URL=https://<your-render-service>.onrender.com
 ```
 
-Add the same Vercel URL to the backend `CORS_ORIGINS` on Railway.
+Add the same Vercel URL to the backend `CORS_ORIGINS`.
 
 ### Auth
 
-- App opens at **`/login`** first (GitHub via Supabase, or **Skip (dev)** with a bypass cookie).
+- The app opens at **`/login`** first (GitHub via Supabase, or **Skip (dev only)** with a bypass cookie).
 - Add redirect URL in Supabase: `http://localhost:3000/auth/callback`.
-- API calls from the browser use same-origin `/api/v1/*` (proxied to the backend by `next.config.ts`).
+- Browser API calls use same-origin `/api/v1/*`, proxied to the backend by `next.config.ts`.
 - LLM providers: **Qwen** (Hugging Face) and **Google Gemini** in Settings → General.
 
 ## Desktop (Electron)
 
-**Development** (Next dev server + Electron window):
-
 ```bash
-npm run dev:desktop
+npm run dev:desktop          # development
+npm run build:desktop:mac    # macOS: .dmg + .zip in dist-electron/
+npm run build:desktop:win    # Windows: NSIS + portable .exe
 ```
 
-**Production installers** (bundles Next.js; run on each OS):
+Full guide: **[docs/DESKTOP-BUILD.md](./docs/DESKTOP-BUILD.md)**. Pushing a `v*` tag builds both platforms in GitHub Actions and attaches them to a GitHub Release.
 
-```bash
-# Set API URL before building (see docs/DESKTOP-BUILD.md)
-export NEXT_PUBLIC_API_URL=https://your-api.up.railway.app
-npm run build:desktop:mac   # macOS — .dmg + .zip in dist-electron/
-npm run build:desktop:win   # Windows — NSIS + portable .exe
-```
+## Deploy summary
 
-Full guide: **[docs/DESKTOP-BUILD.md](./docs/DESKTOP-BUILD.md)**. Tag `v*` pushes build both via GitHub Actions.
-
-## Deploy
-
-Vercel for web; Railway (or similar) for API; GitHub Releases for desktop builds.
+Vercel for web, Render for the API, GitHub Releases for desktop builds. Historical runbooks (v1.0.0 cutover) are in [docs/archive/](./docs/archive/).
