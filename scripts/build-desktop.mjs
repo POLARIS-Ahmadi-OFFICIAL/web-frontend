@@ -7,7 +7,8 @@
  *   npm run build:desktop:mac      # macOS (.dmg + .zip)
  *   npm run build:desktop:win      # Windows (NSIS + portable)
  *
- * Set NEXT_PUBLIC_API_URL (and Supabase vars) before building so they are baked into the UI.
+ * Set NEXT_PUBLIC_API_URL before building so it is baked into the UI.
+ * Do not set NEXT_PUBLIC_SUPABASE_URL/ANON_KEY for desktop — it never uses Supabase.
  */
 import { spawnSync } from "node:child_process";
 import path from "node:path";
